@@ -53,6 +53,9 @@ class Dashboard(ctk.CTkFrame):
         self._relatorio_cache = None
         self._periodo_relatorio = ctk.StringVar(value="30")
         self._kpi_widgets = []
+        self._kpi_cards = []
+        self._kpi_cols = None
+        self._layout_mode = None
         self._build()
 
     def _build(self):
@@ -77,16 +80,17 @@ class Dashboard(ctk.CTkFrame):
         self._kpi_frame = ctk.CTkFrame(self._scroll, fg_color="transparent")
         self._kpi_frame.pack(fill="x", padx=20, pady=(0, 16))
 
-        # Grade principal: 3 colunas
+        # Grade responsiva: resumo em cima e gráficos em uma grade própria.
         bottom = ctk.CTkFrame(self._scroll, fg_color="transparent")
+        self._dashboard_grid = bottom
         bottom.pack(fill="x", padx=20, pady=(0, 20))
-        bottom.columnconfigure(0, weight=3, minsize=320)
-        bottom.columnconfigure(1, weight=2, minsize=260)
-        bottom.columnconfigure(2, weight=2, minsize=260)
+        bottom.columnconfigure(0, weight=1, minsize=300)
+        bottom.columnconfigure(1, weight=1, minsize=300)
 
         # Coluna esquerda: contratos + alertas
         left = ctk.CTkFrame(bottom, fg_color="transparent")
         left.grid(row=0, column=0, sticky="nsew", padx=(0, 8))
+        self._summary_left = left
 
         self._frame_contratos = ctk.CTkFrame(left, fg_color=BG2, corner_radius=10)
         self._frame_contratos.pack(fill="x", pady=(0, 8))
@@ -95,8 +99,8 @@ class Dashboard(ctk.CTkFrame):
                                             fg_color="transparent")
         self._contratos_body.pack(fill="x", padx=0, pady=(0, 10))
 
-        self._frame_alertas = ctk.CTkFrame(left, fg_color=BG2, corner_radius=10)
-        self._frame_alertas.pack(fill="x", pady=(8, 0))
+        self._frame_alertas = ctk.CTkFrame(bottom, fg_color=BG2, corner_radius=10)
+        self._frame_alertas.grid(row=0, column=1, sticky="nsew", padx=(8, 0))
         self._sec_header(self._frame_alertas, "Alertas e pendências")
         # corpo rolável dos alertas (limita o crescimento na tela)
         self._alertas_body = ctk.CTkScrollableFrame(
@@ -104,31 +108,29 @@ class Dashboard(ctk.CTkFrame):
             scrollbar_button_color=BORDER)
         self._alertas_body.pack(fill="x", padx=12, pady=(0, 10))
 
-        # Coluna do meio: gráficos (preenche o espaço que antes ficava vazio)
-        mid = ctk.CTkFrame(bottom, fg_color="transparent")
-        mid.grid(row=0, column=1, sticky="nsew", padx=(0, 8))
-        mid.columnconfigure(0, weight=1)
+        self._charts = ctk.CTkFrame(bottom, fg_color="transparent")
+        self._charts.grid(row=1, column=0, columnspan=2, sticky="nsew", pady=(16, 0))
+        self._charts.columnconfigure(0, weight=1)
+        self._charts.columnconfigure(1, weight=1)
 
-        self._graf_status = DonutChart(mid, "Imóveis por status",
-                                       largura=300, altura=200)
-        self._graf_status.grid(row=0, column=0, sticky="new", pady=(0, 8))
+        self._graf_status = DonutChart(self._charts, "Imóveis por status",
+                                       largura=320, altura=205)
+        self._graf_status.grid(row=0, column=0, sticky="nsew", padx=(0, 8), pady=(0, 8))
 
-        self._graf_finalidade = DonutChart(mid, "Imóveis por finalidade",
-                                           largura=300, altura=200)
-        self._graf_finalidade.grid(row=1, column=0, sticky="new", pady=(8, 0))
+        self._graf_finalidade = DonutChart(self._charts, "Imóveis por finalidade",
+                                           largura=320, altura=205)
+        self._graf_finalidade.grid(row=1, column=0, sticky="nsew", padx=(0, 8), pady=(8, 0))
 
-        # Coluna direita: gráficos
-        right = ctk.CTkFrame(bottom, fg_color="transparent")
-        right.grid(row=0, column=2, sticky="nsew")
-        right.columnconfigure(0, weight=1)
+        self._graf_tipo = BarChart(self._charts, "Contratos por tipo",
+                                   largura=320, altura=205)
+        self._graf_tipo.grid(row=0, column=1, sticky="nsew", padx=(8, 0), pady=(0, 8))
 
-        self._graf_tipo = BarChart(right, "Contratos por tipo",
-                                   largura=300, altura=200)
-        self._graf_tipo.grid(row=0, column=0, sticky="new", pady=(0, 8))
+        self._graf_boleto = BarChart(self._charts, "Boletos por situação",
+                                     largura=320, altura=205)
+        self._graf_boleto.grid(row=1, column=1, sticky="nsew", padx=(8, 0), pady=(8, 0))
 
-        self._graf_boleto = BarChart(right, "Boletos por situação",
-                                     largura=300, altura=200)
-        self._graf_boleto.grid(row=1, column=0, sticky="new", pady=(8, 0))
+        bottom.bind("<Configure>", self._responsive_layout)
+        self._kpi_frame.bind("<Configure>", self._responsive_kpis)
 
         self._frame_relatorio = ctk.CTkFrame(
             self._scroll, fg_color=BG2, corner_radius=10)
@@ -158,6 +160,53 @@ class Dashboard(ctk.CTkFrame):
         self._lbl_hora.configure(
             text=datetime.now().strftime("%d/%m/%Y  %H:%M:%S"))
         self.after(1000, self._tick)
+
+    def _responsive_layout(self, event):
+        """Reorganiza cartões e gráficos para a largura disponível."""
+        narrow = event.width < 920
+        mode = "narrow" if narrow else "wide"
+        if mode == self._layout_mode:
+            return
+        self._layout_mode = mode
+        self._charts.columnconfigure(0, weight=1)
+        if narrow:
+            self._dashboard_grid.columnconfigure(0, weight=1, minsize=240)
+            self._dashboard_grid.columnconfigure(1, weight=0, minsize=0)
+            self._summary_left.grid(row=0, column=0, sticky="nsew", pady=(0, 8))
+            self._frame_alertas.grid(row=1, column=0, sticky="nsew", pady=(8, 0))
+            self._charts.grid(row=2, column=0, columnspan=1, sticky="nsew", pady=(16, 0))
+            self._charts.columnconfigure(1, weight=0)
+            for chart in (self._graf_status, self._graf_finalidade,
+                          self._graf_tipo, self._graf_boleto):
+                chart.grid_configure(column=0, columnspan=1, padx=0)
+            for row, chart in enumerate((self._graf_status, self._graf_tipo,
+                                         self._graf_finalidade, self._graf_boleto)):
+                chart.grid_configure(row=row, column=0, sticky="nsew")
+        else:
+            self._dashboard_grid.columnconfigure(0, weight=1, minsize=300)
+            self._dashboard_grid.columnconfigure(1, weight=1, minsize=300)
+            self._summary_left.grid(row=0, column=0, sticky="nsew", padx=(0, 8))
+            self._frame_alertas.grid(row=0, column=1, sticky="nsew", padx=(8, 0))
+            self._charts.grid(row=1, column=0, columnspan=2, sticky="nsew", pady=(16, 0))
+            self._charts.columnconfigure(1, weight=1)
+            for chart, row, col in (
+                    (self._graf_status, 0, 0), (self._graf_tipo, 0, 1),
+                    (self._graf_finalidade, 1, 0), (self._graf_boleto, 1, 1)):
+                chart.grid_configure(row=row, column=col, columnspan=1,
+                                     sticky="nsew", padx=(0, 8) if col == 0 else (8, 0))
+
+    def _responsive_kpis(self, event=None, width=None):
+        """Mostra os indicadores em uma, duas ou três colunas conforme a tela."""
+        width = width if width is not None else event.width
+        cols = 6 if width >= 1100 else 3 if width >= 620 else 2
+        if cols == self._kpi_cols or not self._kpi_cards:
+            return
+        self._kpi_cols = cols
+        for index, card in enumerate(self._kpi_cards):
+            card.grid_configure(row=index // cols, column=index % cols,
+                                sticky="nsew", padx=4, pady=4)
+        for column in range(6):
+            self._kpi_frame.columnconfigure(column, weight=1 if column < cols else 0)
 
     def atualizar(self, force=False):
         # Ao voltar de outra aba, os widgets já renderizados aparecem
@@ -217,6 +266,8 @@ class Dashboard(ctk.CTkFrame):
                 card.grid(row=0, column=i, sticky="nsew", padx=4)
                 self._kpi_frame.columnconfigure(i, weight=1)
                 self._kpi_widgets.append(valor_lbl)
+                self._kpi_cards.append(card)
+            self._responsive_kpis(width=self._kpi_frame.winfo_width())
         else:
             for valor_lbl, (_, valor, _, _, _) in zip(self._kpi_widgets, kpis):
                 valor_lbl.configure(text=str(valor))

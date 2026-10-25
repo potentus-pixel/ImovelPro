@@ -75,7 +75,7 @@ class App(ctk.CTk):
         super().__init__()
         self.title("ImóvelPro — Sistema de Gestão Imobiliária")
         self.geometry("1280x760")
-        self.minsize(1100, 640)
+        self.minsize(920, 600)
         self.configure(fg_color=BG)
 
         # Ícone da janela / barra de tarefas (não usar o ícone padrão do Python)

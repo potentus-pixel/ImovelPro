@@ -1,4 +1,4 @@
-import tkinter as tk
+﻿import tkinter as tk
 import customtkinter as ctk
 import weakref
 
@@ -489,7 +489,7 @@ class DonutChart(ctk.CTkFrame):
     """Gráfico de rosca (PIL + CTkImage): data=[(label,valor,cor),...].
     - render em alta resolução (supersampling) => nítido em telas HiDPI
     - desenho completo e imediato (sem animação incompleta / arco aberto)
-    - hover destaca o segmento e mostra tooltip
+    - hover destaca o segmento e atualiza o centro do gráfico
     """
 
     def __init__(self, master, titulo, largura=250, altura=185, **kw):
@@ -497,6 +497,7 @@ class DonutChart(ctk.CTkFrame):
         super().__init__(master, fg_color=BG2, corner_radius=10, **kw)
         self._titulo = titulo
         self._dw, self._dh = int(largura), int(altura)
+        self._min_dw, self._max_dw = 220, int(largura)
         self._scale = 2
         self._data = []
         self._segs = []
@@ -508,7 +509,15 @@ class DonutChart(ctk.CTkFrame):
         self._img.pack(padx=10, pady=(2, 12))
         self._img.bind("<Motion>", self._on_move)
         self._img.bind("<Leave>", self._on_leave)
-        self._tip = None
+        self.bind("<Configure>", self._on_resize)
+        self._render()
+
+    def _on_resize(self, event):
+        """Redimensiona o desenho para caber na largura do cartão."""
+        width = max(self._min_dw, min(self._max_dw, event.width - 20))
+        if width == self._dw or width <= 1:
+            return
+        self._dw = width
         self._render()
 
     def set_data(self, data):
@@ -612,46 +621,17 @@ class DonutChart(ctk.CTkFrame):
         return None
 
     def _on_move(self, ev):
-        """Trata o movimento do ponteiro e exibe detalhes do elemento apontado."""
+        """Destaca o segmento sob o ponteiro sem abrir janela flutuante."""
         idx = self._hit(ev.x, ev.y)
         if idx != self._hover:
             self._hover = idx
             self._render()
-            self._show_tip(ev, idx)
 
     def _on_leave(self, ev):
         """Oculta os detalhes quando o ponteiro deixa a área do gráfico."""
         if self._hover is not None:
             self._hover = None
             self._render()
-        self._hide_tip()
-
-    def _show_tip(self, ev, idx):
-        """Exibe a dica com os dados do elemento gráfico apontado."""
-        self._hide_tip()
-        if idx is None or idx >= len(self._data):
-            return
-        label, val, color = self._data[idx]
-        total = sum(v for _, v, _ in self._data) or 1
-        pct = val / total * 100
-        tip = ctk.CTkToplevel(self)
-        tip.wm_overrideredirect(True)
-        tip.configure(fg_color=BG3)
-        ctk.CTkLabel(tip, text=f"{label}:  {val}  ({pct:.1f}%)",
-                     font=font(12), text_color=TEXT, padx=10, pady=5).pack()
-        x = self.winfo_rootx() + ev.x + 14
-        y = self.winfo_rooty() + ev.y + 14
-        tip.geometry(f"+{x}+{y}")
-        self._tip = tip
-
-    def _hide_tip(self):
-        """Oculta a dica de dados do gráfico."""
-        if self._tip is not None:
-            try:
-                self._tip.destroy()
-            except Exception:
-                pass
-            self._tip = None
 
 
 class BarChart(ctk.CTkFrame):
@@ -662,6 +642,7 @@ class BarChart(ctk.CTkFrame):
         super().__init__(master, fg_color=BG2, corner_radius=10, **kw)
         self._titulo = titulo
         self._dw, self._dh = int(largura), int(altura)
+        self._min_dw, self._max_dw = 220, int(largura)
         self._scale = 2
         self._data = []
         self._hover = None
@@ -672,7 +653,15 @@ class BarChart(ctk.CTkFrame):
         self._img.pack(padx=10, pady=(2, 12))
         self._img.bind("<Motion>", self._on_move)
         self._img.bind("<Leave>", self._on_leave)
-        self._tip = None
+        self.bind("<Configure>", self._on_resize)
+        self._render()
+
+    def _on_resize(self, event):
+        """Redimensiona o desenho para caber na largura do cartão."""
+        width = max(self._min_dw, min(self._max_dw, event.width - 20))
+        if width == self._dw or width <= 1:
+            return
+        self._dw = width
         self._render()
 
     def set_data(self, data):
@@ -745,44 +734,17 @@ class BarChart(ctk.CTkFrame):
         return None
 
     def _on_move(self, ev):
-        """Trata o movimento do ponteiro e exibe detalhes do elemento apontado."""
+        """Destaca o segmento sob o ponteiro sem abrir janela flutuante."""
         idx = self._hit(ev.x, ev.y)
         if idx != self._hover:
             self._hover = idx
             self._render()
-            self._show_tip(ev, idx)
 
     def _on_leave(self, ev):
         """Oculta os detalhes quando o ponteiro deixa a área do gráfico."""
         if self._hover is not None:
             self._hover = None
             self._render()
-        self._hide_tip()
-
-    def _show_tip(self, ev, idx):
-        """Exibe a dica com os dados do elemento gráfico apontado."""
-        self._hide_tip()
-        if idx is None or idx >= len(self._data):
-            return
-        label, val, color = self._data[idx]
-        tip = ctk.CTkToplevel(self)
-        tip.wm_overrideredirect(True)
-        tip.configure(fg_color=BG3)
-        ctk.CTkLabel(tip, text=f"{label}:  {val}", font=font(12),
-                     text_color=TEXT, padx=10, pady=5).pack()
-        x = self.winfo_rootx() + ev.x + 14
-        y = self.winfo_rooty() + ev.y + 14
-        tip.geometry(f"+{x}+{y}")
-        self._tip = tip
-
-    def _hide_tip(self):
-        """Oculta a dica de dados do gráfico."""
-        if self._tip is not None:
-            try:
-                self._tip.destroy()
-            except Exception:
-                pass
-            self._tip = None
 
 
 def _escurecer(hexcor):
@@ -793,3 +755,4 @@ def _escurecer(hexcor):
         return f"#{int(r*f):02x}{int(g*f):02x}{int(b*f):02x}"
     except Exception:
         return hexcor
+
