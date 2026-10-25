@@ -1,0 +1,7 @@
+﻿__pycache__/
+*.py[cod]
+*.db
+config.json
+erro_inicio.txt
+.venv/
+venv/

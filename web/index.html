@@ -1,0 +1,1694 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ImóvelPro — Sistema de Gestão Imobiliária</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, -apple-system, sans-serif; background: #f5f5f0; color: #1a1a18; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+/* TOPBAR */
+.topbar { display: flex; align-items: center; background: #fff; border-bottom: 0.5px solid #d3d1c7; flex-shrink: 0; z-index: 10; }
+.logo { padding: 10px 16px; font-size: 15px; font-weight: 700; border-right: 0.5px solid #d3d1c7; white-space: nowrap; color: #1a1a18; letter-spacing: -0.3px; }
+.logo span { color: #1D9E75; }
+.nav-i { padding: 10px 14px; font-size: 12px; color: #5f5e5a; border-right: 0.5px solid #d3d1c7; white-space: nowrap; display: flex; align-items: center; gap: 5px; cursor: pointer; transition: background 0.15s; user-select: none; }
+.nav-i:hover { background: #f5f5f0; }
+.nav-i.on { color: #0F6E56; background: #E1F5EE; }
+.nav-i i { font-size: 14px; }
+.topbar-end { margin-left: auto; padding: 8px 14px; font-size: 12px; color: #5f5e5a; display: flex; align-items: center; gap: 8px; border-left: 0.5px solid #d3d1c7; }
+.av { width: 26px; height: 26px; border-radius: 50%; background: #9FE1CB; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: #04342C; flex-shrink: 0; }
+
+/* LAYOUT */
+.app-body { display: flex; flex: 1; overflow: hidden; }
+.sidebar { width: 152px; background: #fff; border-right: 0.5px solid #d3d1c7; padding: 14px 0; flex-shrink: 0; overflow-y: auto; }
+.sb-section { padding: 0 10px; margin-bottom: 18px; }
+.sb-label { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #b4b2a9; margin-bottom: 6px; padding: 0 4px; }
+.sb-item { display: flex; align-items: center; gap: 7px; padding: 7px 8px; font-size: 11px; color: #5f5e5a; border-radius: 8px; cursor: pointer; margin-bottom: 1px; transition: background 0.12s; user-select: none; }
+.sb-item:hover { background: #f5f5f0; }
+.sb-item.on { background: #E1F5EE; color: #0F6E56; font-weight: 600; }
+.sb-item i { font-size: 14px; flex-shrink: 0; }
+.badge { font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 99px; margin-left: auto; }
+.ba { background: #FAC775; color: #412402; }
+.bt { background: #9FE1CB; color: #04342C; }
+
+/* MAIN */
+.main { flex: 1; overflow-y: auto; }
+
+/* PAGES */
+.page { display: none; }
+.page.active { display: block; }
+
+/* DASHBOARD */
+.dash-content { padding: 18px; }
+.kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+.kpi { background: #fff; border: 0.5px solid #d3d1c7; border-radius: 8px; padding: 12px 14px; }
+.kpi-lbl { font-size: 10px; color: #888780; margin-bottom: 5px; }
+.kpi-val { font-size: 22px; font-weight: 600; line-height: 1; }
+.kpi-sub { font-size: 10px; color: #1D9E75; margin-top: 4px; }
+.kpi-sub.warn { color: #BA7517; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.card { background: #fff; border: 0.5px solid #d3d1c7; border-radius: 8px; overflow: hidden; }
+.ch { padding: 9px 12px; border-bottom: 0.5px solid #d3d1c7; display: flex; align-items: center; justify-content: space-between; }
+.ch-t { font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.ch-t i { font-size: 14px; color: #1D9E75; }
+.ch-a { font-size: 10px; color: #1D9E75; cursor: pointer; }
+.ch-a:hover { text-decoration: underline; }
+.tr { display: flex; align-items: center; padding: 8px 12px; border-bottom: 0.5px solid #d3d1c7; gap: 8px; font-size: 11px; transition: background 0.1s; cursor: pointer; }
+.tr:last-child { border-bottom: none; }
+.tr:hover { background: #f5f5f0; }
+.tr-n { font-weight: 600; flex: 1; font-size: 11px; }
+.tr-s { font-size: 10px; color: #888780; flex: 1; }
+.st { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 99px; white-space: nowrap; }
+.sg { background: #EAF3DE; color: #27500A; }
+.sa { background: #FAEEDA; color: #412402; }
+.sr { background: #FCEBEB; color: #501313; }
+.se { background: #E1F5EE; color: #04342C; }
+.avsm { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; flex-shrink: 0; }
+
+/* TABLE PAGE */
+.page-header { padding: 16px 18px 0; display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.page-title { font-size: 15px; font-weight: 600; }
+.page-sub { font-size: 11px; color: #888780; margin-top: 2px; }
+.filter-bar { padding: 10px 18px; display: flex; align-items: center; gap: 8px; background: #fff; border-top: 0.5px solid #d3d1c7; border-bottom: 0.5px solid #d3d1c7; }
+.filter-bar input { flex: 1; font-size: 12px; padding: 6px 10px; border: 0.5px solid #d3d1c7; border-radius: 8px; background: #fff; color: #1a1a18; font-family: inherit; outline: none; }
+.filter-bar input:focus { border-color: #1D9E75; }
+.filter-bar select { font-size: 12px; padding: 6px 10px; border: 0.5px solid #d3d1c7; border-radius: 8px; background: #fff; color: #1a1a18; font-family: inherit; outline: none; cursor: pointer; }
+.filter-more { padding: 8px 18px; display: flex; flex-wrap: wrap; align-items: end; gap: 8px; background: #fff; border-bottom: 0.5px solid #d3d1c7; }
+.filter-more label { display: flex; flex-direction: column; gap: 3px; font-size: 9px; color: #888780; font-weight: 600; }
+.filter-more input, .filter-more select { font-size: 11px; min-width: 125px; padding: 6px 8px; border: 0.5px solid #d3d1c7; border-radius: 7px; background: #fff; color: #1a1a18; font-family: inherit; }
+.filter-more .filter-actions { margin-left: auto; display: flex; gap: 6px; }
+.btn-new { font-size: 12px; padding: 6px 14px; background: #1D9E75; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 5px; white-space: nowrap; transition: background 0.15s; }
+.btn-new:hover { background: #0F6E56; }
+.btn-outline { font-size: 11px; padding: 6px 10px; background: #fff; color: #0F6E56; border: 0.5px solid #9FE1CB; border-radius: 8px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.btn-outline:hover { background: #E1F5EE; }
+.btn-outline.active-filter { background: #E1F5EE; border-color: #1D9E75; }
+.table-wrap { padding: 0 18px 18px; }
+table.tbl { width: 100%; border-collapse: collapse; font-size: 11px; background: #fff; border: 0.5px solid #d3d1c7; border-radius: 8px; overflow: hidden; margin-top: 12px; }
+table.tbl thead tr { background: #f5f5f0; }
+table.tbl th { padding: 8px 12px; text-align: left; font-size: 10px; font-weight: 700; color: #888780; text-transform: uppercase; letter-spacing: 0.04em; }
+table.tbl td { padding: 9px 12px; border-top: 0.5px solid #d3d1c7; }
+table.tbl tr:hover td { background: #f9f9f6; cursor: pointer; }
+table.tbl td.name { font-weight: 600; }
+table.tbl td.muted { color: #888780; }
+.pill { font-size: 9px; font-weight: 700; padding: 2px 8px; border-radius: 99px; }
+.pill-teal { background: #E1F5EE; color: #085041; }
+.pill-blue { background: #E6F1FB; color: #0C447C; }
+.more-btn { color: #b4b2a9; font-size: 16px; cursor: pointer; padding: 2px 4px; border-radius: 4px; }
+.more-btn:hover { color: #5f5e5a; background: #f5f5f0; }
+
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.32); z-index: 100; display: none; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: #fff; border-radius: 12px; border: 0.5px solid #d3d1c7; width: 640px; max-width: 95vw; max-height: 88vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+.modal-header { padding: 14px 18px; border-bottom: 0.5px solid #d3d1c7; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: #fff; z-index: 1; }
+.modal-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 7px; }
+.modal-title i { color: #1D9E75; font-size: 16px; }
+.modal-close { color: #888780; font-size: 18px; cursor: pointer; padding: 3px; border-radius: 4px; line-height: 1; }
+.modal-close:hover { color: #1a1a18; background: #f5f5f0; }
+.modal-body { padding: 18px; }
+.modal-footer { padding: 12px 18px; border-top: 0.5px solid #d3d1c7; display: flex; justify-content: flex-end; gap: 8px; }
+.modal-footer > .btn-danger:first-child { margin-right: auto; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-grid.cols3 { grid-template-columns: 1fr 1fr 1fr; }
+.span2 { grid-column: span 2; }
+.fg { display: flex; flex-direction: column; gap: 4px; }
+.fg label { font-size: 10px; color: #888780; font-weight: 600; letter-spacing: 0.02em; }
+.fg input, .fg select, .fg textarea { font-size: 12px; padding: 7px 10px; border: 0.5px solid #d3d1c7; border-radius: 8px; background: #fff; color: #1a1a18; font-family: inherit; outline: none; transition: border-color 0.15s; }
+.fg input:focus, .fg select:focus, .fg textarea:focus { border-color: #1D9E75; }
+.fg textarea { resize: vertical; min-height: 72px; }
+.section-title { font-size: 11px; font-weight: 700; color: #5f5e5a; margin: 16px 0 10px; display: flex; align-items: center; gap: 6px; }
+.section-title i { color: #1D9E75; font-size: 13px; }
+.section-title:first-child { margin-top: 0; }
+.btn-cancel { font-size: 12px; padding: 7px 16px; background: none; border: 0.5px solid #d3d1c7; border-radius: 8px; cursor: pointer; color: #5f5e5a; font-family: inherit; transition: background 0.12s; }
+.btn-cancel:hover { background: #f5f5f0; }
+.btn-save { font-size: 12px; padding: 7px 18px; background: #1D9E75; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-family: inherit; transition: background 0.15s; }
+.btn-save:hover { background: #0F6E56; }
+.btn-danger { font-size: 12px; padding: 7px 16px; background: none; border: 0.5px solid #F09595; border-radius: 8px; cursor: pointer; color: #A32D2D; font-family: inherit; }
+.btn-danger:hover { background: #FCEBEB; }
+
+/* MULTI-PHONE & MULTI-OWNER */
+.tag-input-wrap { display: flex; flex-wrap: wrap; gap: 5px; padding: 6px 8px; border: 0.5px solid #d3d1c7; border-radius: 8px; background: #fff; cursor: text; min-height: 36px; align-items: center; }
+.tag-input-wrap:focus-within { border-color: #1D9E75; }
+.tag { font-size: 11px; background: #E1F5EE; color: #085041; border-radius: 99px; padding: 2px 8px 2px 10px; display: flex; align-items: center; gap: 4px; }
+.tag-x { cursor: pointer; font-size: 10px; opacity: 0.7; }
+.tag-x:hover { opacity: 1; }
+.tag-input-wrap input { border: none; outline: none; font-size: 12px; font-family: inherit; color: #1a1a18; background: transparent; min-width: 80px; flex: 1; }
+
+/* DETAIL VIEW */
+.detail-section { padding: 18px; }
+.detail-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; }
+.detail-back { font-size: 11px; color: #1D9E75; cursor: pointer; display: flex; align-items: center; gap: 4px; margin-bottom: 10px; }
+.detail-back:hover { text-decoration: underline; }
+.detail-title { font-size: 17px; font-weight: 700; }
+.detail-sub { font-size: 12px; color: #888780; margin-top: 3px; }
+.detail-actions { display: flex; gap: 8px; }
+.info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+.info-card { background: #fff; border: 0.5px solid #d3d1c7; border-radius: 8px; padding: 12px 14px; }
+.info-lbl { font-size: 10px; color: #888780; margin-bottom: 4px; }
+.info-val { font-size: 13px; font-weight: 600; }
+.info-val.green { color: #0F6E56; }
+.info-val.amber { color: #BA7517; }
+.info-val.red { color: #A32D2D; }
+.related-section { background: #fff; border: 0.5px solid #d3d1c7; border-radius: 8px; overflow: hidden; margin-bottom: 12px; }
+
+/* BOLETOS */
+.boleto-row { display: flex; align-items: center; padding: 10px 14px; border-bottom: 0.5px solid #d3d1c7; gap: 10px; font-size: 11px; }
+.boleto-row:last-child { border-bottom: none; }
+.boleto-cod { font-weight: 600; color: #5f5e5a; font-size: 10px; width: 70px; }
+.boleto-info { flex: 1; }
+.boleto-info .b-main { font-weight: 600; font-size: 11px; }
+.boleto-info .b-sub { font-size: 10px; color: #888780; margin-top: 1px; }
+.boleto-val { font-weight: 700; font-size: 12px; min-width: 80px; text-align: right; }
+.boleto-actions { display: flex; gap: 6px; }
+.btn-sm { font-size: 10px; padding: 4px 10px; border-radius: 6px; cursor: pointer; border: 0.5px solid #d3d1c7; background: #fff; color: #5f5e5a; font-family: inherit; transition: background 0.12s; }
+.btn-sm:hover { background: #f5f5f0; }
+.btn-sm.green { background: #E1F5EE; border-color: #9FE1CB; color: #0F6E56; font-weight: 600; }
+.btn-sm.green:hover { background: #9FE1CB; }
+
+/* EMPTY STATE */
+.empty-state { text-align: center; padding: 48px 24px; color: #888780; }
+.empty-state i { font-size: 32px; margin-bottom: 10px; opacity: 0.5; }
+.empty-state p { font-size: 12px; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 24px; right: 24px; background: #1a1a18; color: #fff; font-size: 12px; padding: 10px 16px; border-radius: 8px; z-index: 999; opacity: 0; transform: translateY(8px); transition: all 0.2s; pointer-events: none; display: flex; align-items: center; gap: 8px; }
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast i { color: #9FE1CB; }
+.toast.err i { color: #F09595; }
+
+/* CORRETORES MULTI */
+.corretor-tag { display: flex; align-items: center; gap: 8px; background: #f5f5f0; border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; }
+.corretor-tag .ct-name { font-size: 11px; font-weight: 600; flex: 1; }
+.corretor-tag .ct-creci { font-size: 10px; color: #888780; }
+.corretor-tag .ct-pct { width: 72px; }
+.corretor-tag .ct-rm { color: #b4b2a9; cursor: pointer; font-size: 14px; }
+.corretor-tag .ct-rm:hover { color: #E24B4A; }
+
+/* RESPONSIVENESS */
+@media (max-width: 900px) {
+  .kpi-row { grid-template-columns: 1fr 1fr; }
+  .two-col { grid-template-columns: 1fr; }
+  .info-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 680px) {
+  body { overflow: auto; }
+  .topbar { overflow-x: auto; }
+  .topbar .nav-i { display: none; }
+  .sidebar { width: 58px; }
+  .sb-label, .sb-item span:not(.badge) { display: none; }
+  .sb-item { justify-content: center; padding: 10px 6px; }
+  .badge { position: absolute; margin: -20px 0 0 22px; }
+  .kpi-row, .info-grid, .form-grid, .form-grid.cols3 {
+    grid-template-columns: 1fr;
+  }
+  .span2 { grid-column: span 1; }
+  .filter-bar { flex-wrap: wrap; }
+  .filter-bar input { flex-basis: 100%; }
+  .filter-more label { flex: 1 1 42%; }
+  .filter-more input, .filter-more select { min-width: 0; width: 100%; }
+  .filter-more .filter-actions { margin-left: 0; }
+  #report-kpis { grid-template-columns: 1fr 1fr !important; }
+  .table-wrap { overflow-x: auto; padding-left: 10px; padding-right: 10px; }
+  table.tbl { min-width: 760px; }
+}
+</style>
+</head>
+<body class="authenticated">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">Imóvel<span>Pro</span></div>
+  <div class="nav-i on" onclick="navigate('dashboard')"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
+  <div class="nav-i" onclick="navigate('imoveis')"><i class="ti ti-building"></i> Imóveis</div>
+  <div class="nav-i" onclick="navigate('clientes')"><i class="ti ti-users"></i> Clientes</div>
+  <div class="nav-i" onclick="navigate('corretores')"><i class="ti ti-id-badge"></i> Corretores</div>
+  <div class="nav-i" onclick="navigate('contratos')"><i class="ti ti-file-text"></i> Contratos</div>
+  <div class="nav-i" onclick="navigate('boletos')"><i class="ti ti-receipt"></i> Boletos</div>
+  <div class="topbar-end"><div class="av">IP</div><span>ImóvelPro</span></div>
+</div>
+
+<div class="app-body">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-section">
+      <div class="sb-label">Visão geral</div>
+      <div class="sb-item on" onclick="navigate('dashboard')"><i class="ti ti-chart-bar"></i> Relatórios</div>
+      <div class="sb-item" id="sb-alertas"><i class="ti ti-bell"></i> Alertas <span class="badge ba" id="badge-alertas">3</span></div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-label">Cadastros</div>
+      <div class="sb-item" onclick="navigate('imoveis')"><i class="ti ti-building"></i> Imóveis</div>
+      <div class="sb-item" onclick="navigate('corretores')"><i class="ti ti-id-badge"></i> Corretores</div>
+      <div class="sb-item" onclick="navigate('clientes')"><i class="ti ti-users"></i> Clientes</div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-label">Negócios</div>
+      <div class="sb-item" onclick="navigate('contratos')"><i class="ti ti-home-dollar"></i> Contratos <span class="badge bt" id="badge-contratos">2</span></div>
+      <div class="sb-item" onclick="navigate('boletos')"><i class="ti ti-receipt"></i> Boletos</div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="dash-content">
+        <div class="kpi-row">
+          <div class="kpi">
+            <div class="kpi-lbl">Imóveis ativos</div>
+            <div class="kpi-val" id="kpi-imoveis">0</div>
+            <div class="kpi-sub">cadastrados no sistema</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-lbl">Contratos vigentes</div>
+            <div class="kpi-val" id="kpi-contratos">0</div>
+            <div class="kpi-sub">ativos ou em espera</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-lbl">Boletos em aberto</div>
+            <div class="kpi-val" id="kpi-boletos" style="color:#BA7517">0</div>
+            <div class="kpi-sub warn" id="kpi-boletos-sub">pendentes</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-lbl">Clientes cadastrados</div>
+            <div class="kpi-val" id="kpi-clientes">0</div>
+            <div class="kpi-sub">no sistema</div>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="ch">
+              <div class="ch-t"><i class="ti ti-file-text"></i> Últimos contratos</div>
+              <div class="ch-a" onclick="navigate('contratos')">Ver todos</div>
+            </div>
+            <div id="dash-contratos-list"></div>
+          </div>
+          <div class="card">
+            <div class="ch">
+              <div class="ch-t"><i class="ti ti-bell"></i> Alertas e pendências</div>
+              <div class="ch-a">Resolver</div>
+            </div>
+            <div id="dash-alertas-list"></div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:12px">
+          <div class="ch"><div class="ch-t"><i class="ti ti-chart-bar"></i> Relatórios operacionais</div>
+            <div style="display:flex;gap:6px;align-items:center">
+              <select id="report-period" onchange="renderReports()" aria-label="Período do relatório" style="font-size:10px;padding:4px 7px;border:1px solid #d3d1c7;border-radius:6px;background:#fff">
+                <option value="30">Próximos 30 dias</option><option value="60">Próximos 60 dias</option><option value="90">Próximos 90 dias</option>
+              </select>
+              <button class="btn-outline" onclick="exportReport()"><i class="ti ti-download"></i> Exportar CSV</button>
+            </div>
+          </div>
+          <div class="kpi-row" style="padding:12px;margin:0" id="report-kpis"></div>
+          <div class="two-col" style="padding:0 12px 12px">
+            <div><div class="ch-t" style="padding:8px 0">Imóveis disponíveis por cidade</div><div id="report-cities"></div></div>
+            <div><div class="ch-t" style="padding:8px 0">Contratos a vencer</div><div id="report-expiring"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IMÓVEIS -->
+    <div class="page" id="page-imoveis">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Imóveis</div>
+          <div class="page-sub" id="imoveis-count">Carregando...</div>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <input type="text" placeholder="Buscar por código, endereço ou proprietário..." id="search-imoveis" oninput="renderImoveis()">
+        <select id="filter-imovel-tipo" onchange="renderImoveis()">
+          <option value="">Todos os tipos</option>
+          <option value="Urbano">Urbano</option>
+          <option value="Rural">Rural</option>
+        </select>
+        <select id="filter-imovel-fin" onchange="renderImoveis()">
+          <option value="">Todas finalidades</option>
+          <option value="venda">Venda</option>
+          <option value="aluguel">Aluguel</option>
+        </select>
+        <button class="btn-outline" onclick="togglePropertyFilters()" aria-expanded="false" id="property-filter-toggle"><i class="ti ti-adjustments"></i> Mais filtros</button>
+        <button class="btn-outline" onclick="exportProperties()"><i class="ti ti-download"></i> Exportar</button>
+        <button class="btn-new" onclick="openModal('modal-imovel')"><i class="ti ti-plus"></i> Novo imóvel</button>
+      </div>
+      <div class="filter-more" id="property-extra-filters" hidden>
+        <label>Cidade<input id="filter-imovel-cidade" list="property-cities" placeholder="Qualquer cidade" oninput="renderImoveis()"><datalist id="property-cities"></datalist></label>
+        <label>Status<select id="filter-imovel-status" onchange="renderImoveis()"><option value="">Todos os status</option><option value="disponivel">Disponível</option><option value="em negociacao">Em negociação</option><option value="alugado">Alugado</option><option value="vendido">Vendido</option></select></label>
+        <label>Valor mínimo<input id="filter-imovel-min" type="number" min="0" placeholder="R$ 0" oninput="renderImoveis()"></label>
+        <label>Valor máximo<input id="filter-imovel-max" type="number" min="0" placeholder="Sem limite" oninput="renderImoveis()"></label>
+        <label>Ordenar por<select id="sort-imoveis" onchange="renderImoveis()"><option value="recentes">Mais recentes</option><option value="codigo">Código</option><option value="menor-preco">Menor preço</option><option value="maior-preco">Maior preço</option><option value="maior-area">Maior área</option></select></label>
+        <div class="filter-actions"><button class="btn-outline" onclick="clearPropertyFilters()">Limpar filtros</button></div>
+      </div>
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Código</th><th>Tipo</th><th>Endereço</th><th>Área</th><th>Status</th><th>Finalidade</th><th>Valor</th><th>Proprietário(s)</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="tbody-imoveis"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CLIENTES -->
+    <div class="page" id="page-clientes">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Clientes</div>
+          <div class="page-sub" id="clientes-count">Carregando...</div>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <input type="text" placeholder="Buscar por nome, CPF ou telefone..." id="search-clientes" oninput="renderClientes()">
+        <select id="filter-cliente-tipo" onchange="renderClientes()">
+          <option value="">Todos os perfis</option>
+          <option value="dono">Proprietário</option>
+          <option value="interessado">Interessado</option>
+        </select>
+        <button class="btn-new" onclick="openModal('modal-cliente')"><i class="ti ti-plus"></i> Novo cliente</button>
+      </div>
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Código</th><th>Nome</th><th>CPF</th><th>Telefone(s)</th><th>Perfil</th><th>Imóveis</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="tbody-clientes"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CORRETORES -->
+    <div class="page" id="page-corretores">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Corretores</div>
+          <div class="page-sub" id="corretores-count">Carregando...</div>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <input type="text" placeholder="Buscar por nome, CPF ou CRECI..." id="search-corretores" oninput="renderCorretores()">
+        <button class="btn-new" onclick="openModal('modal-corretor')"><i class="ti ti-plus"></i> Novo corretor</button>
+      </div>
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Nome</th><th>CPF</th><th>CRECI</th><th>Telefone(s)</th><th>Contratos</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="tbody-corretores"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CONTRATOS -->
+    <div class="page" id="page-contratos">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Contratos</div>
+          <div class="page-sub" id="contratos-count">Carregando...</div>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <input type="text" placeholder="Buscar por número, cliente ou imóvel..." id="search-contratos" oninput="renderContratos()">
+        <select id="filter-contrato-tipo" onchange="renderContratos()">
+          <option value="">Todos os tipos</option>
+          <option value="venda">Venda</option>
+          <option value="aluguel">Aluguel</option>
+        </select>
+        <select id="filter-contrato-status" onchange="renderContratos()">
+          <option value="">Todos os status</option>
+          <option value="em espera">Em espera</option>
+          <option value="ativo">Ativo</option>
+          <option value="encerrado">Encerrado</option>
+        </select>
+        <button class="btn-new" onclick="openModal('modal-contrato')"><i class="ti ti-plus"></i> Novo contrato</button>
+      </div>
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Nº</th><th>Adquirente(s)</th><th>Cedente(s)</th><th>Imóvel</th><th>Tipo</th><th>Valor</th><th>Assinatura</th><th>Status</th><th>Corretor(es)</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="tbody-contratos"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BOLETOS -->
+    <div class="page" id="page-boletos">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Boletos</div>
+          <div class="page-sub" id="boletos-count">Carregando...</div>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <input type="text" placeholder="Buscar por número, contrato ou cliente..." id="search-boletos" oninput="renderBoletos()">
+        <select id="filter-boleto-tipo" onchange="renderBoletos()">
+          <option value="">Todos os tipos</option>
+          <option value="comissao">Comissão</option>
+          <option value="parcela">Parcela</option>
+          <option value="aluguel">Aluguel</option>
+        </select>
+        <select id="filter-boleto-status" onchange="renderBoletos()">
+          <option value="">Todos os status</option>
+          <option value="pendente">Pendente</option>
+          <option value="pago">Pago</option>
+          <option value="vencido">Vencido</option>
+        </select>
+        <button class="btn-new" onclick="openModal('modal-boleto')"><i class="ti ti-plus"></i> Novo boleto</button>
+      </div>
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Nº</th><th>Contrato</th><th>Tipo</th><th>Valor</th><th>Vencimento</th><th>Pagamento</th><th>Status</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="tbody-boletos"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- end .main -->
+</div><!-- end .app-body -->
+
+<!-- ============================================================
+     MODAIS
+     ============================================================ -->
+
+<!-- MODAL IMÓVEL -->
+<div class="modal-overlay" id="modal-imovel">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><i class="ti ti-building"></i> <span id="modal-imovel-title">Novo imóvel</span></div>
+      <span class="modal-close" onclick="closeModal('modal-imovel')"><i class="ti ti-x"></i></span>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="imovel-edit-id">
+      <div class="section-title"><i class="ti ti-info-circle"></i> Dados gerais</div>
+      <div class="form-grid">
+        <div class="fg">
+          <label>Código</label>
+          <input type="text" id="imovel-codigo" placeholder="IM-0001">
+        </div>
+        <div class="fg">
+          <label>Área (m²)</label>
+          <input type="number" id="imovel-area" placeholder="120">
+        </div>
+        <div class="fg">
+          <label>Categoria</label>
+          <select id="imovel-categoria" onchange="toggleSubtipo()">
+            <option value="Urbano">Urbano</option>
+            <option value="Rural">Rural</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Subtipo</label>
+          <select id="imovel-subtipo"></select>
+        </div>
+        <div class="fg">
+          <label>Finalidade</label>
+          <select id="imovel-finalidade" onchange="toggleValores()">
+            <option value="venda">Somente venda</option>
+            <option value="aluguel">Somente aluguel</option>
+            <option value="ambos">Venda e aluguel</option>
+          </select>
+        </div>
+      </div>
+      <div class="section-title"><i class="ti ti-map-pin"></i> Endereço</div>
+      <div class="form-grid">
+        <div class="fg">
+          <label>Rua / Logradouro</label>
+          <input type="text" id="imovel-rua" placeholder="Rua das Palmeiras">
+        </div>
+        <div class="fg">
+          <label>Número</label>
+          <input type="text" id="imovel-numero" placeholder="340">
+        </div>
+        <div class="fg">
+          <label>Bairro</label>
+          <input type="text" id="imovel-bairro" placeholder="Copacabana">
+        </div>
+        <div class="fg">
+          <label>Cidade</label>
+          <input type="text" id="imovel-cidade" placeholder="Rio de Janeiro">
+        </div>
+      </div>
+      <div class="section-title"><i class="ti ti-currency-dollar"></i> Valores</div>
+      <div class="form-grid">
+        <div class="fg" id="wrap-venda">
+          <label>Valor de venda (R$)</label>
+          <input type="number" id="imovel-venda" placeholder="0,00">
+        </div>
+        <div class="fg" id="wrap-aluguel">
+          <label>Aluguel mensal (R$)</label>
+          <input type="number" id="imovel-aluguel" placeholder="0,00">
+        </div>
+      </div>
+      <div class="section-title"><i class="ti ti-users"></i> Proprietários</div>
+      <div id="proprietarios-list"></div>
+      <div class="form-grid" style="margin-top:8px">
+        <div class="fg">
+          <label>Adicionar proprietário</label>
+          <select id="sel-proprietario">
+            <option value="">Selecione um cliente...</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>% de posse</label>
+          <input type="number" id="imovel-prop-pct" placeholder="100" min="1" max="100">
+        </div>
+      </div>
+      <button class="btn-sm" style="margin-top:6px" onclick="addProprietario()"><i class="ti ti-plus"></i> Adicionar</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-danger" id="delete-imovel" style="display:none"
+              onclick="removeResource('imoveis','imovel-edit-id','modal-imovel')">Excluir</button>
+      <button class="btn-cancel" onclick="closeModal('modal-imovel')">Cancelar</button>
+      <button class="btn-save" onclick="saveImovel()">Salvar imóvel</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CLIENTE -->
+<div class="modal-overlay" id="modal-cliente">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><i class="ti ti-user"></i> <span id="modal-cliente-title">Novo cliente</span></div>
+      <span class="modal-close" onclick="closeModal('modal-cliente')"><i class="ti ti-x"></i></span>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="cliente-edit-id">
+      <div class="form-grid">
+        <div class="fg">
+          <label>Código</label>
+          <input type="text" id="cliente-codigo" placeholder="CLI-0001">
+        </div>
+        <div class="fg">
+          <label>CPF</label>
+          <input type="text" id="cliente-cpf" placeholder="000.000.000-00">
+        </div>
+        <div class="fg span2">
+          <label>Nome completo</label>
+          <input type="text" id="cliente-nome" placeholder="Nome do cliente">
+        </div>
+        <div class="fg span2">
+          <label>Telefones (pressione Enter para adicionar)</label>
+          <div class="tag-input-wrap" id="cliente-telefones-wrap" onclick="this.querySelector('input').focus()">
+            <input type="text" placeholder="(00) 00000-0000" onkeydown="addTag(event,'cliente-telefones-wrap')">
+          </div>
+        </div>
+        <div class="fg">
+          <label>Perfil</label>
+          <select id="cliente-perfil">
+            <option value="interessado">Somente interessado</option>
+            <option value="dono">Somente proprietário</option>
+            <option value="ambos">Proprietário e interessado</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-danger" id="delete-cliente" style="display:none"
+              onclick="removeResource('clientes','cliente-edit-id','modal-cliente')">Excluir</button>
+      <button class="btn-cancel" onclick="closeModal('modal-cliente')">Cancelar</button>
+      <button class="btn-save" onclick="saveCliente()">Salvar cliente</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CORRETOR -->
+<div class="modal-overlay" id="modal-corretor">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><i class="ti ti-id-badge"></i> <span id="modal-corretor-title">Novo corretor</span></div>
+      <span class="modal-close" onclick="closeModal('modal-corretor')"><i class="ti ti-x"></i></span>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="corretor-edit-id">
+      <div class="form-grid">
+        <div class="fg span2">
+          <label>Nome completo</label>
+          <input type="text" id="corretor-nome" placeholder="Nome do corretor">
+        </div>
+        <div class="fg">
+          <label>CPF</label>
+          <input type="text" id="corretor-cpf" placeholder="000.000.000-00">
+        </div>
+        <div class="fg">
+          <label>CRECI</label>
+          <input type="text" id="corretor-creci" placeholder="12345/RJ">
+        </div>
+        <div class="fg span2">
+          <label>Telefones (pressione Enter para adicionar)</label>
+          <div class="tag-input-wrap" id="corretor-telefones-wrap" onclick="this.querySelector('input').focus()">
+            <input type="text" placeholder="(00) 00000-0000" onkeydown="addTag(event,'corretor-telefones-wrap')">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-danger" id="delete-corretor" style="display:none"
+              onclick="removeResource('corretores','corretor-edit-id','modal-corretor')">Excluir</button>
+      <button class="btn-cancel" onclick="closeModal('modal-corretor')">Cancelar</button>
+      <button class="btn-save" onclick="saveCorretor()">Salvar corretor</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONTRATO -->
+<div class="modal-overlay" id="modal-contrato">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><i class="ti ti-file-text"></i> <span id="modal-contrato-title">Novo contrato</span></div>
+      <span class="modal-close" onclick="closeModal('modal-contrato')"><i class="ti ti-x"></i></span>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="contrato-edit-id">
+      <div class="section-title"><i class="ti ti-info-circle"></i> Dados gerais</div>
+      <div class="form-grid">
+        <div class="fg">
+          <label>Código</label>
+          <input type="text" id="contrato-codigo" placeholder="CT-0001">
+        </div>
+        <div class="fg">
+          <label>Tipo</label>
+          <select id="contrato-tipo" onchange="toggleContrato()">
+            <option value="venda">Venda</option>
+            <option value="aluguel">Aluguel / Arrendamento</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Valor do contrato (R$)</label>
+          <input type="number" id="contrato-valor" placeholder="0,00">
+        </div>
+        <div class="fg">
+          <label>Valor da comissão (R$)</label>
+          <input type="number" id="contrato-comissao" placeholder="0,00">
+        </div>
+        <div class="fg">
+          <label>Data de assinatura</label>
+          <input type="date" id="contrato-data">
+        </div>
+        <div class="fg">
+          <label>Situação</label>
+          <select id="contrato-situacao">
+            <option value="em espera">Em espera</option>
+            <option value="ativo">Ativo</option>
+            <option value="encerrado">Encerrado</option>
+          </select>
+        </div>
+      </div>
+      <!-- Venda -->
+      <div id="wrap-contrato-venda">
+        <div class="section-title"><i class="ti ti-home-dollar"></i> Dados da venda</div>
+        <div class="form-grid">
+          <div class="fg">
+            <label>Valor de entrada (R$)</label>
+            <input type="number" id="contrato-entrada" placeholder="0,00">
+          </div>
+          <div class="fg">
+            <label>Número de parcelas</label>
+            <input type="number" id="contrato-parcelas" placeholder="0">
+          </div>
+        </div>
+      </div>
+      <!-- Aluguel -->
+      <div id="wrap-contrato-aluguel" style="display:none">
+        <div class="section-title"><i class="ti ti-key"></i> Dados do aluguel</div>
+        <div class="form-grid">
+          <div class="fg">
+            <label>Duração (meses)</label>
+            <input type="number" id="contrato-duracao" placeholder="12">
+          </div>
+          <div class="fg">
+            <label>Dia de vencimento</label>
+            <input type="number" id="contrato-vencdia" placeholder="5" min="1" max="31">
+          </div>
+        </div>
+      </div>
+      <div class="section-title"><i class="ti ti-building"></i> Imóvel</div>
+      <div class="form-grid">
+        <div class="fg span2">
+          <label>Imóvel</label>
+          <select id="contrato-imovel"></select>
+        </div>
+      </div>
+      <div class="section-title"><i class="ti ti-users"></i> Partes</div>
+      <div class="form-grid">
+        <div class="fg span2">
+          <label>Adquirente(s) — cliente(s) interessado(s)</label>
+          <div id="contrato-adquirentes-list"></div>
+          <select id="sel-adquirente" style="margin-top:6px">
+            <option value="">Selecionar adquirente...</option>
+          </select>
+          <button class="btn-sm" style="margin-top:4px" onclick="addContratoParte('adquirente')"><i class="ti ti-plus"></i> Adicionar</button>
+        </div>
+        <div class="fg span2">
+          <label>Cedente(s) — proprietário(s) do imóvel</label>
+          <div id="contrato-cedentes-list"></div>
+          <select id="sel-cedente" style="margin-top:6px">
+            <option value="">Selecionar cedente...</option>
+          </select>
+          <button class="btn-sm" style="margin-top:4px" onclick="addContratoParte('cedente')"><i class="ti ti-plus"></i> Adicionar</button>
+        </div>
+      </div>
+      <div class="section-title"><i class="ti ti-id-badge"></i> Corretores</div>
+      <div id="contrato-corretores-list"></div>
+      <div class="form-grid" style="margin-top:8px">
+        <div class="fg">
+          <label>Adicionar corretor</label>
+          <select id="sel-corretor-contrato">
+            <option value="">Selecionar corretor...</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>% de comissão</label>
+          <input type="number" id="contrato-corr-pct" placeholder="100" min="1" max="100">
+        </div>
+      </div>
+      <button class="btn-sm" style="margin-top:6px" onclick="addContratoCorretor()"><i class="ti ti-plus"></i> Adicionar</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-danger" id="delete-contrato" style="display:none"
+              onclick="removeResource('contratos','contrato-edit-id','modal-contrato')">Excluir</button>
+      <button class="btn-cancel" onclick="closeModal('modal-contrato')">Cancelar</button>
+      <button class="btn-save" onclick="saveContrato()">Salvar contrato</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL BOLETO -->
+<div class="modal-overlay" id="modal-boleto">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><i class="ti ti-receipt"></i> <span id="modal-boleto-title">Novo boleto</span></div>
+      <span class="modal-close" onclick="closeModal('modal-boleto')"><i class="ti ti-x"></i></span>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="boleto-edit-id">
+      <div class="form-grid">
+        <div class="fg span2">
+          <label>Contrato</label>
+          <select id="boleto-contrato"></select>
+        </div>
+        <div class="fg">
+          <label>Tipo</label>
+          <select id="boleto-tipo">
+            <option value="comissao">Comissão</option>
+            <option value="parcela">Parcela</option>
+            <option value="aluguel">Aluguel</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Situação</label>
+          <select id="boleto-situacao">
+            <option value="pendente">Pendente</option>
+            <option value="pago">Pago</option>
+            <option value="vencido">Vencido</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Valor (R$)</label>
+          <input type="number" id="boleto-valor" placeholder="0,00">
+        </div>
+        <div class="fg">
+          <label>Data de vencimento</label>
+          <input type="date" id="boleto-vencimento">
+        </div>
+        <div class="fg span2">
+          <label>Data de pagamento (deixe em branco se pendente)</label>
+          <input type="date" id="boleto-pagamento">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-danger" id="delete-boleto" style="display:none"
+              onclick="removeResource('boletos','boleto-edit-id','modal-boleto')">Excluir</button>
+      <button class="btn-cancel" onclick="closeModal('modal-boleto')">Cancelar</button>
+      <button class="btn-save" onclick="saveBoleto()">Salvar boleto</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i class="ti ti-check"></i> <span id="toast-msg"></span></div>
+
+<script>
+// ============================================================
+// BANCO DE DADOS em memória
+// ============================================================
+let DB = {
+  clientes: [
+    { id: 1, codigo: 'CLI-0001', nome: 'Maria Clara Souza', cpf: '111.222.333-44', telefones: ['(21) 98001-1111'], perfil: 'ambos' },
+    { id: 2, codigo: 'CLI-0002', nome: 'Pedro Teixeira Lima', cpf: '222.333.444-55', telefones: ['(21) 97002-2222'], perfil: 'interessado' },
+    { id: 3, codigo: 'CLI-0003', nome: 'Ana Lima Ferreira', cpf: '333.444.555-66', telefones: ['(21) 96003-3333', '(21) 3001-9999'], perfil: 'interessado' },
+    { id: 4, codigo: 'CLI-0004', nome: 'Roberto Freitas Costa', cpf: '444.555.666-77', telefones: ['(21) 95004-4444'], perfil: 'dono' },
+    { id: 5, codigo: 'CLI-0005', nome: 'Fernanda Souza Melo', cpf: '555.666.777-88', telefones: ['(21) 94005-5555'], perfil: 'ambos' },
+    { id: 6, codigo: 'CLI-0006', nome: 'Carlos Andrade', cpf: '666.777.888-99', telefones: ['(21) 93006-6666'], perfil: 'dono' },
+  ],
+  corretores: [
+    { id: 1, nome: 'João Corretor Silva', cpf: '100.200.300-40', creci: '12345/RJ', telefones: ['(21) 99100-2000'] },
+    { id: 2, nome: 'Maria Santos Dias', cpf: '200.300.400-50', creci: '23456/RJ', telefones: ['(21) 99200-3000'] },
+    { id: 3, nome: 'Carlos Mendes', cpf: '300.400.500-60', creci: '34567/RJ', telefones: ['(21) 99300-4000'] },
+  ],
+  imoveis: [
+    { id: 1, codigo: 'IM-0001', categoria: 'Urbano', subtipo: 'Apartamento', area: 85, rua: 'Av. Atlântica, 302', bairro: 'Copacabana', cidade: 'Rio de Janeiro', finalidade: 'aluguel', venda: null, aluguel: 2800, proprietarios: [{ clienteId: 1, pct: 100 }] },
+    { id: 2, codigo: 'IM-0002', categoria: 'Urbano', subtipo: 'Casa', area: 180, rua: 'Rua das Palmeiras, 5B', bairro: 'Botafogo', cidade: 'Rio de Janeiro', finalidade: 'venda', venda: 485000, aluguel: null, proprietarios: [{ clienteId: 4, pct: 70 }, { clienteId: 6, pct: 30 }] },
+    { id: 3, codigo: 'IM-0003', categoria: 'Urbano', subtipo: 'Apartamento', area: 45, rua: 'Rua do Catete, 12', bairro: 'Centro', cidade: 'Rio de Janeiro', finalidade: 'aluguel', venda: null, aluguel: 1500, proprietarios: [{ clienteId: 6, pct: 100 }] },
+    { id: 4, codigo: 'IM-0004', categoria: 'Urbano', subtipo: 'Terreno', area: 400, rua: 'Av. das Américas, Lot. 7', bairro: 'Barra da Tijuca', cidade: 'Rio de Janeiro', finalidade: 'venda', venda: 120000, aluguel: null, proprietarios: [{ clienteId: 5, pct: 50 }, { clienteId: 1, pct: 50 }] },
+    { id: 5, codigo: 'IM-0005', categoria: 'Rural', subtipo: 'Fazenda', area: 12000, rua: 'Estrada Velha, km 12', bairro: 'Zona Rural', cidade: 'Itaperuna', finalidade: 'venda', venda: 1200000, aluguel: null, proprietarios: [{ clienteId: 4, pct: 100 }] },
+  ],
+  contratos: [
+    { id: 1, codigo: 'CT-0038', tipo: 'aluguel', valor: 2800, comissao: 280, data: '2024-03-01', situacao: 'ativo', imovelId: 1, adquirentes: [{ clienteId: 1 }], cedentes: [{ clienteId: 1 }], corretores: [{ corretorId: 1, pct: 100 }], duracao: 12, vencdia: 1 },
+    { id: 2, codigo: 'CT-0039', tipo: 'venda', valor: 485000, comissao: 19400, data: '2024-04-15', situacao: 'ativo', imovelId: 2, adquirentes: [{ clienteId: 2 }], cedentes: [{ clienteId: 4 }, { clienteId: 6 }], corretores: [{ corretorId: 2, pct: 60 }, { corretorId: 1, pct: 40 }], entrada: 50000, parcelas: 120 },
+    { id: 3, codigo: 'CT-0041', tipo: 'aluguel', valor: 1500, comissao: 150, data: '2024-05-01', situacao: 'em espera', imovelId: 3, adquirentes: [{ clienteId: 3 }], cedentes: [{ clienteId: 6 }], corretores: [{ corretorId: 1, pct: 100 }], duracao: 12, vencdia: 5 },
+    { id: 4, codigo: 'CT-0043', tipo: 'venda', valor: 120000, comissao: 6000, data: '2024-01-10', situacao: 'encerrado', imovelId: 4, adquirentes: [{ clienteId: 2 }], cedentes: [{ clienteId: 5 }, { clienteId: 1 }], corretores: [{ corretorId: 3, pct: 100 }], entrada: 20000, parcelas: 60 },
+  ],
+  boletos: [
+    { id: 1, seq: 'BOL-0001', contratoId: 1, tipo: 'aluguel', situacao: 'pago', valor: 2800, vencimento: '2024-03-01', pagamento: '2024-02-28' },
+    { id: 2, seq: 'BOL-0002', contratoId: 1, tipo: 'aluguel', situacao: 'pago', valor: 2800, vencimento: '2024-04-01', pagamento: '2024-04-01' },
+    { id: 3, seq: 'BOL-0003', contratoId: 1, tipo: 'aluguel', situacao: 'pendente', valor: 2800, vencimento: '2024-05-01', pagamento: null },
+    { id: 4, seq: 'BOL-0004', contratoId: 1, tipo: 'comissao', situacao: 'pago', valor: 280, vencimento: '2024-03-05', pagamento: '2024-03-05' },
+    { id: 5, seq: 'BOL-0005', contratoId: 2, tipo: 'comissao', situacao: 'pendente', valor: 19400, vencimento: '2024-05-01', pagamento: null },
+    { id: 6, seq: 'BOL-0006', contratoId: 3, tipo: 'comissao', situacao: 'vencido', valor: 150, vencimento: '2024-05-10', pagamento: null },
+    { id: 7, seq: 'BOL-0007', contratoId: 2, tipo: 'parcela', situacao: 'pago', valor: 3625, vencimento: '2024-05-15', pagamento: '2024-05-14' },
+  ],
+  nextIds: { clientes: 7, corretores: 4, imoveis: 6, contratos: 5, boletos: 8 }
+};
+
+// Temporários para modais com listas dinâmicas
+let tempProprietarios = [];
+let tempAdquirentes = [];
+let tempCedentes = [];
+let tempCorretoresContrato = [];
+
+// ============================================================
+// NAVEGAÇÃO
+// ============================================================
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-i').forEach(n => n.classList.remove('on'));
+  document.querySelectorAll('.sb-item').forEach(s => s.classList.remove('on'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav-i').forEach(n => {
+    if (n.getAttribute('onclick') === `navigate('${page}')`) n.classList.add('on');
+  });
+  document.querySelectorAll('.sb-item').forEach(s => {
+    if (s.getAttribute('onclick') === `navigate('${page}')`) s.classList.add('on');
+  });
+  renderPage(page);
+}
+
+function renderPage(page) {
+  if (page === 'dashboard') renderDashboard();
+  if (page === 'imoveis') renderImoveis();
+  if (page === 'clientes') renderClientes();
+  if (page === 'corretores') renderCorretores();
+  if (page === 'contratos') renderContratos();
+  if (page === 'boletos') renderBoletos();
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function fmt(val) {
+  if (!val && val !== 0) return '—';
+  return 'R$ ' + Number(val).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+}
+function fmtDate(d) {
+  if (!d) return '—';
+  const [y, m, dd] = d.split('-');
+  return `${dd}/${m}/${y}`;
+}
+function esc(value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+  })[char]);
+}
+function initials(name) {
+  return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+}
+function avatarColor(id) {
+  const colors = [
+    ['#9FE1CB', '#04342C'], ['#CECBF6', '#26215C'], ['#FAC775', '#412402'],
+    ['#F4C0D1', '#4B1528'], ['#B5D4F4', '#042C53'], ['#C0DD97', '#173404']
+  ];
+  return colors[(id - 1) % colors.length];
+}
+function getCliente(id) { return DB.clientes.find(c => c.id === id); }
+function getCorretor(id) { return DB.corretores.find(c => c.id === id); }
+function getImovel(id) { return DB.imoveis.find(i => i.id === id); }
+function getContrato(id) { return DB.contratos.find(c => c.id === id); }
+
+function stBadge(s) {
+  if (s === 'ativo') return '<span class="st sg">Ativo</span>';
+  if (s === 'em espera') return '<span class="st sa">Em espera</span>';
+  if (s === 'encerrado') return '<span class="st se">Encerrado</span>';
+  if (s === 'pendente') return '<span class="st sa">Pendente</span>';
+  if (s === 'pago') return '<span class="st sg">Pago</span>';
+  if (s === 'vencido') return '<span class="st sr">Vencido</span>';
+  return s;
+}
+
+function toast(msg, err) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.className = 'toast show' + (err ? ' err' : '');
+  t.querySelector('i').className = err ? 'ti ti-x' : 'ti ti-check';
+  clearTimeout(window._toastT);
+  window._toastT = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDashboard() {
+  document.getElementById('kpi-imoveis').textContent = DB.imoveis.length;
+  document.getElementById('kpi-contratos').textContent = DB.contratos.filter(c => c.situacao !== 'encerrado').length;
+  const abertos = DB.boletos.filter(b => b.situacao !== 'pago').length;
+  document.getElementById('kpi-boletos').textContent = abertos;
+  document.getElementById('kpi-clientes').textContent = DB.clientes.length;
+
+  // Últimos contratos
+  const ul = document.getElementById('dash-contratos-list');
+  ul.innerHTML = DB.contratos.slice(-4).reverse().map(c => {
+    const adq = getCliente(c.adquirentes[0]?.clienteId);
+    const im = getImovel(c.imovelId);
+    const [bg, fg] = avatarColor(adq?.id || 1);
+    return `<div class="tr" onclick="navigate('contratos')">
+      <div class="avsm" style="background:${bg};color:${fg}">${esc(initials(adq?.nome || '?'))}</div>
+      <div class="tr-n">${esc(adq?.nome || '—')}</div>
+      <div class="tr-s">${c.tipo === 'aluguel' ? 'Aluguel' : 'Venda'} · ${esc(im?.subtipo || '')}</div>
+      ${stBadge(c.situacao)}
+    </div>`;
+  }).join('');
+
+  // Alertas
+  const al = document.getElementById('dash-alertas-list');
+  const alertas = [];
+  DB.boletos.filter(b => b.situacao === 'vencido').forEach(b => {
+    alertas.push({ icon: 'ti-alert-triangle', color: '#BA7517', title: 'Boleto vencido', sub: `Contrato ${getContrato(b.contratoId)?.codigo}` });
+  });
+  DB.boletos.filter(b => b.situacao === 'pendente').slice(0, 2).forEach(b => {
+    alertas.push({ icon: 'ti-clock', color: '#1D9E75', title: 'Boleto a vencer', sub: `Venc. ${fmtDate(b.vencimento)}` });
+  });
+  if (alertas.length === 0) alertas.push({ icon: 'ti-circle-check', color: '#1D9E75', title: 'Tudo em dia', sub: 'Nenhuma pendência encontrada' });
+  al.innerHTML = alertas.slice(0, 4).map(a =>
+    `<div class="tr"><i class="ti ${a.icon}" style="color:${a.color};font-size:14px;flex-shrink:0"></i>
+    <div class="tr-n">${esc(a.title)}</div><div class="tr-s">${esc(a.sub)}</div></div>`
+  ).join('');
+  renderReports();
+}
+
+async function renderReports() {
+  const period = Number(document.getElementById('report-period')?.value || 30);
+  try {
+    const report = await api(`/api/reports/operations?period=${period}`);
+    const summary = report.summary;
+    const cards = [
+      ['Imóveis disponíveis', summary.disponiveis, 'no estoque'],
+      ['Contratos a vencer', summary.contratosAVencer, `nos próximos ${period} dias`],
+      ['Boletos vencidos', summary.boletosVencidos, fmt(summary.valorBoletosVencidos) + ' em aberto']
+    ];
+    document.getElementById('report-kpis').innerHTML = cards.map(([label, value, sub]) =>
+      `<div class="kpi"><div class="kpi-lbl">${esc(label)}</div><div class="kpi-val">${esc(value)}</div><div class="kpi-sub">${esc(sub)}</div></div>`).join('');
+    const cities = report.inventoryByCity;
+    document.getElementById('report-cities').innerHTML = cities.length ? cities.slice(0, 6).map(row =>
+      `<div class="tr" data-city="${esc(row.cidade)}" onclick="openPropertiesInCity(this.dataset.city)"><div class="tr-n">${esc(row.cidade)}</div><div class="tr-s">${row.quantidade} disponível(is)</div></div>`).join('') : '<div class="empty-state"><p>Nenhum imóvel disponível no momento.</p></div>';
+    const expiring = report.expiringContracts;
+    document.getElementById('report-expiring').innerHTML = expiring.length ? expiring.slice(0, 6).map(row =>
+      `<div class="tr" onclick="navigate('contratos')"><i class="ti ti-calendar-time" style="color:#BA7517"></i><div class="tr-n">${esc(row.codigo)}</div><div class="tr-s">${esc(row.imovel_codigo)} · até ${fmtDate(row.fim)}</div></div>`).join('') : '<div class="empty-state"><p>Nenhum contrato previsto para vencer nesse período.</p></div>';
+  } catch (error) {
+    document.getElementById('report-kpis').innerHTML = `<div class="empty-state"><p>${esc(error.message)}</p></div>`;
+  }
+}
+
+function exportReport() {
+  const period = Number(document.getElementById('report-period')?.value || 30);
+  window.location.href = `/api/reports/operations.csv?period=${period}`;
+}
+
+function openPropertiesInCity(city) {
+  navigate('imoveis');
+  document.getElementById('property-extra-filters').hidden = false;
+  document.getElementById('property-filter-toggle').setAttribute('aria-expanded', 'true');
+  document.getElementById('filter-imovel-cidade').value = city;
+  document.getElementById('filter-imovel-status').value = 'disponivel';
+  renderImoveis();
+}
+
+// ============================================================
+// IMÓVEIS
+// ============================================================
+function filteredImoveis() {
+  const q = (document.getElementById('search-imoveis')?.value || '').toLowerCase();
+  const tp = document.getElementById('filter-imovel-tipo')?.value || '';
+  const fn = document.getElementById('filter-imovel-fin')?.value || '';
+  const city = (document.getElementById('filter-imovel-cidade')?.value || '').trim().toLocaleLowerCase('pt-BR');
+  const status = document.getElementById('filter-imovel-status')?.value || '';
+  const min = Number(document.getElementById('filter-imovel-min')?.value || 0);
+  const maxRaw = document.getElementById('filter-imovel-max')?.value || '';
+  const max = maxRaw === '' ? Infinity : Number(maxRaw);
+  const sort = document.getElementById('sort-imoveis')?.value || 'recentes';
+  const expanded = document.getElementById('property-extra-filters');
+  const filterToggle = document.getElementById('property-filter-toggle');
+  const hasAdvancedFilters = Boolean(city || status || min || maxRaw);
+  filterToggle?.classList.toggle('active-filter', hasAdvancedFilters);
+  if (filterToggle) filterToggle.innerHTML = `<i class="ti ti-adjustments"></i> Mais filtros${hasAdvancedFilters ? ' · ativos' : ''}`;
+  let list = DB.imoveis;
+  if (q) list = list.filter(i => i.codigo.toLowerCase().includes(q) || i.rua.toLowerCase().includes(q) || i.bairro.toLowerCase().includes(q) || i.cidade.toLowerCase().includes(q) || i.proprietarios.some(p => getCliente(p.clienteId)?.nome.toLowerCase().includes(q)));
+  if (tp) list = list.filter(i => i.categoria === tp);
+  if (fn) list = list.filter(i => i.finalidade === fn || i.finalidade === 'ambos');
+  if (city) list = list.filter(i => i.cidade.toLocaleLowerCase('pt-BR').includes(city));
+  if (status) list = list.filter(i => (i.status || 'disponivel') === status);
+  const price = i => i.finalidade === 'aluguel' ? Number(i.aluguel || 0) : Number(i.venda || i.aluguel || 0);
+  list = list.filter(i => price(i) >= min && price(i) <= max);
+  list = [...list].sort(sort === 'codigo' ? (a,b) => a.codigo.localeCompare(b.codigo) : sort === 'menor-preco' ? (a,b) => price(a)-price(b) : sort === 'maior-preco' ? (a,b) => price(b)-price(a) : sort === 'maior-area' ? (a,b) => b.area-a.area : (a,b) => b.id-a.id);
+  return list;
+}
+
+function renderImoveis() {
+  const list = filteredImoveis();
+  document.getElementById('imoveis-count').textContent = `${list.length} imóvel(is) encontrado(s)`;
+  const cities = [...new Set(DB.imoveis.map(i => i.cidade).filter(Boolean))].sort();
+  document.getElementById('property-cities').innerHTML = cities.map(c => `<option value="${esc(c)}"></option>`).join('');
+  document.getElementById('tbody-imoveis').innerHTML = list.map(im => {
+    const props = im.proprietarios.map(p => getCliente(p.clienteId)?.nome.split(' ')[0]).join(', ');
+    const val = im.finalidade === 'aluguel' ? fmt(im.aluguel) + '/mês' : im.finalidade === 'venda' ? fmt(im.venda) : fmt(im.venda) + ' / ' + fmt(im.aluguel) + '/mês';
+    const fin = im.finalidade === 'venda' ? '<span class="pill pill-blue">Venda</span>' : im.finalidade === 'aluguel' ? '<span class="pill pill-teal">Aluguel</span>' : '<span class="pill pill-blue">Venda</span> <span class="pill pill-teal">Aluguel</span>';
+    const state = im.status || 'disponivel';
+    const statusLabel = { disponivel: 'Disponível', 'em negociacao': 'Em negociação', alugado: 'Alugado', vendido: 'Vendido' }[state] || state;
+    const statusClass = state === 'disponivel' ? 'sg' : state === 'em negociacao' ? 'sa' : 'sr';
+    return `<tr onclick="editImovel(${im.id})">
+      <td class="muted">${esc(im.codigo)}</td>
+      <td class="name">${esc(im.categoria)} — ${esc(im.subtipo)}</td>
+      <td class="muted">${esc(im.rua)}${im.numero ? ', ' + esc(im.numero) : ''}, ${esc(im.bairro)}</td>
+      <td class="muted">${im.area} m²</td>
+      <td><span class="st ${statusClass}">${esc(statusLabel)}</span></td>
+      <td>${fin}</td>
+      <td><strong>${val}</strong></td>
+      <td class="muted">${esc(props)}</td>
+      <td><span class="more-btn" onclick="event.stopPropagation();editImovel(${im.id})"><i class="ti ti-dots-vertical"></i></span></td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="9" style="text-align:center;padding:24px;color:#888780;font-size:12px">Nenhum imóvel encontrado. Ajuste ou limpe os filtros para ampliar a busca.</td></tr>';
+}
+
+function togglePropertyFilters() {
+  const panel = document.getElementById('property-extra-filters');
+  const button = document.getElementById('property-filter-toggle');
+  panel.hidden = !panel.hidden;
+  button.setAttribute('aria-expanded', String(!panel.hidden));
+}
+
+function clearPropertyFilters() {
+  ['filter-imovel-cidade', 'filter-imovel-min', 'filter-imovel-max'].forEach(id => document.getElementById(id).value = '');
+  ['filter-imovel-status', 'sort-imoveis', 'filter-imovel-tipo', 'filter-imovel-fin'].forEach(id => document.getElementById(id).selectedIndex = 0);
+  document.getElementById('search-imoveis').value = '';
+  renderImoveis();
+}
+
+function exportProperties() {
+  const headers = ['Código','Categoria','Tipo','Endereço','Número','Bairro','Cidade','Área m²','Status','Finalidade','Venda','Aluguel','Proprietários'];
+  const rows = filteredImoveis().map(im => {
+    return [im.codigo, im.categoria, im.subtipo, im.rua, im.numero || '', im.bairro, im.cidade, im.area, im.status || 'disponivel', im.finalidade, im.venda ?? '', im.aluguel ?? '', im.proprietarios.map(p => getCliente(p.clienteId)?.nome).filter(Boolean).join(', ')];
+  });
+  const csv = [headers, ...rows].map(row => row.map(value => `"${String(value).replaceAll('"', '""')}"`).join(';')).join('\r\n');
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(new Blob(['\ufeff', csv], { type: 'text/csv;charset=utf-8' }));
+  link.download = 'imoveis-filtrados.csv';
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+// ============================================================
+// CLIENTES
+// ============================================================
+function renderClientes() {
+  const q = (document.getElementById('search-clientes')?.value || '').toLowerCase();
+  const tp = document.getElementById('filter-cliente-tipo')?.value || '';
+  let list = DB.clientes;
+  if (q) list = list.filter(c => c.nome.toLowerCase().includes(q) || c.cpf.includes(q) || c.telefones.join('').includes(q));
+  if (tp) list = list.filter(c => c.perfil === tp || c.perfil === 'ambos');
+  document.getElementById('clientes-count').textContent = `${list.length} cliente(s) encontrado(s)`;
+  document.getElementById('tbody-clientes').innerHTML = list.map(c => {
+    const [bg, fg] = avatarColor(c.id);
+    const imoveis = DB.imoveis.filter(i => i.proprietarios.some(p => p.clienteId === c.id)).length;
+    const perfilLabel = c.perfil === 'dono' ? '<span class="st se">Proprietário</span>' : c.perfil === 'interessado' ? '<span class="st sg">Interessado</span>' : '<span class="st se">Proprietário</span> <span class="st sg">Interessado</span>';
+    return `<tr onclick="editCliente(${c.id})">
+      <td class="muted">${esc(c.codigo)}</td>
+      <td><div style="display:flex;align-items:center;gap:7px"><div class="avsm" style="background:${bg};color:${fg}">${esc(initials(c.nome))}</div><strong>${esc(c.nome)}</strong></div></td>
+      <td class="muted">${esc(c.cpf)}</td>
+      <td class="muted">${esc(c.telefones.join(', '))}</td>
+      <td>${perfilLabel}</td>
+      <td class="muted">${imoveis > 0 ? imoveis + ' imóvel(is)' : '—'}</td>
+      <td><span class="more-btn"><i class="ti ti-dots-vertical"></i></span></td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="7" style="text-align:center;padding:24px;color:#888780;font-size:12px">Nenhum cliente encontrado</td></tr>';
+}
+
+// ============================================================
+// CORRETORES
+// ============================================================
+function renderCorretores() {
+  const q = (document.getElementById('search-corretores')?.value || '').toLowerCase();
+  let list = DB.corretores;
+  if (q) list = list.filter(c => c.nome.toLowerCase().includes(q) || c.cpf.includes(q) || c.creci.toLowerCase().includes(q));
+  document.getElementById('corretores-count').textContent = `${list.length} corretor(es) encontrado(s)`;
+  document.getElementById('tbody-corretores').innerHTML = list.map(c => {
+    const [bg, fg] = avatarColor(c.id);
+    const nContratos = DB.contratos.filter(ct => ct.corretores.some(cr => cr.corretorId === c.id)).length;
+    return `<tr onclick="editCorretor(${c.id})">
+      <td><div style="display:flex;align-items:center;gap:7px"><div class="avsm" style="background:${bg};color:${fg}">${esc(initials(c.nome))}</div><strong>${esc(c.nome)}</strong></div></td>
+      <td class="muted">${esc(c.cpf)}</td>
+      <td class="muted">${esc(c.creci)}</td>
+      <td class="muted">${esc(c.telefones.join(', '))}</td>
+      <td class="muted">${nContratos} contrato(s)</td>
+      <td><span class="more-btn"><i class="ti ti-dots-vertical"></i></span></td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="6" style="text-align:center;padding:24px;color:#888780;font-size:12px">Nenhum corretor encontrado</td></tr>';
+}
+
+// ============================================================
+// CONTRATOS
+// ============================================================
+function renderContratos() {
+  const q = (document.getElementById('search-contratos')?.value || '').toLowerCase();
+  const tp = document.getElementById('filter-contrato-tipo')?.value || '';
+  const st = document.getElementById('filter-contrato-status')?.value || '';
+  let list = DB.contratos;
+  if (q) list = list.filter(c => c.codigo.toLowerCase().includes(q) || getImovel(c.imovelId)?.bairro.toLowerCase().includes(q) || c.adquirentes.some(a => getCliente(a.clienteId)?.nome.toLowerCase().includes(q)));
+  if (tp) list = list.filter(c => c.tipo === tp);
+  if (st) list = list.filter(c => c.situacao === st);
+  document.getElementById('contratos-count').textContent = `${list.length} contrato(s) encontrado(s)`;
+  document.getElementById('tbody-contratos').innerHTML = list.map(c => {
+    const adqs = c.adquirentes.map(a => getCliente(a.clienteId)?.nome.split(' ')[0]).join(', ');
+    const ceds = c.cedentes.map(a => getCliente(a.clienteId)?.nome.split(' ')[0]).join(', ');
+    const im = getImovel(c.imovelId);
+    const corrs = c.corretores.map(cr => getCorretor(cr.corretorId)?.nome.split(' ')[0]).join(', ');
+    const tipo = c.tipo === 'aluguel' ? '<span class="pill pill-teal">Aluguel</span>' : '<span class="pill pill-blue">Venda</span>';
+    return `<tr onclick="editContrato(${c.id})">
+      <td class="muted">${esc(c.codigo)}</td>
+      <td class="name">${esc(adqs)}</td>
+      <td class="muted">${esc(ceds)}</td>
+      <td class="muted">${esc(im?.subtipo)} · ${esc(im?.bairro)}</td>
+      <td>${tipo}</td>
+      <td><strong>${fmt(c.valor)}</strong></td>
+      <td class="muted">${fmtDate(c.data)}</td>
+      <td>${stBadge(c.situacao)}</td>
+      <td class="muted">${esc(corrs)}</td>
+      <td><span class="more-btn"><i class="ti ti-dots-vertical"></i></span></td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="10" style="text-align:center;padding:24px;color:#888780;font-size:12px">Nenhum contrato encontrado</td></tr>';
+}
+
+// ============================================================
+// BOLETOS
+// ============================================================
+function renderBoletos() {
+  const q = (document.getElementById('search-boletos')?.value || '').toLowerCase();
+  const tp = document.getElementById('filter-boleto-tipo')?.value || '';
+  const st = document.getElementById('filter-boleto-status')?.value || '';
+  let list = DB.boletos;
+  if (q) list = list.filter(b => b.seq.toLowerCase().includes(q) || getContrato(b.contratoId)?.codigo.toLowerCase().includes(q));
+  if (tp) list = list.filter(b => b.tipo === tp);
+  if (st) list = list.filter(b => b.situacao === st);
+  document.getElementById('boletos-count').textContent = `${list.length} boleto(s) encontrado(s)`;
+  document.getElementById('tbody-boletos').innerHTML = list.map(b => {
+    const ct = getContrato(b.contratoId);
+    const tipoLabel = { comissao: 'Comissão', parcela: 'Parcela', aluguel: 'Aluguel' }[b.tipo] || b.tipo;
+    return `<tr onclick="editBoleto(${b.id})">
+      <td class="muted">${esc(b.seq)}</td>
+      <td class="name">${esc(ct?.codigo || '—')}</td>
+      <td class="muted">${esc(tipoLabel)}</td>
+      <td><strong>${fmt(b.valor)}</strong></td>
+      <td class="muted">${fmtDate(b.vencimento)}</td>
+      <td class="muted">${fmtDate(b.pagamento)}</td>
+      <td>${stBadge(b.situacao)}</td>
+      <td><span class="more-btn"><i class="ti ti-dots-vertical"></i></span></td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="8" style="text-align:center;padding:24px;color:#888780;font-size:12px">Nenhum boleto encontrado</td></tr>';
+}
+
+// ============================================================
+// MODAIS — HELPERS
+// ============================================================
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  if (id === 'modal-imovel') initModalImovel();
+  if (id === 'modal-cliente') initModalCliente();
+  if (id === 'modal-corretor') initModalCorretor();
+  if (id === 'modal-contrato') initModalContrato();
+  if (id === 'modal-boleto') initModalBoleto();
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// Fecha ao clicar fora
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+});
+
+// TAG INPUT (telefones)
+function addTag(e, wrapId) {
+  if (e.key !== 'Enter') return;
+  const wrap = document.getElementById(wrapId);
+  const input = wrap.querySelector('input');
+  const val = input.value.trim();
+  if (!val) return;
+  const tag = document.createElement('span');
+  tag.className = 'tag';
+  tag.innerHTML = `${esc(val)} <span class="tag-x" onclick="this.parentElement.remove()">✕</span>`;
+  wrap.insertBefore(tag, input);
+  input.value = '';
+  e.preventDefault();
+}
+
+function getTags(wrapId) {
+  return Array.from(document.querySelectorAll(`#${wrapId} .tag`)).map(t => t.textContent.trim().replace('✕', '').trim());
+}
+
+function setTags(wrapId, tags) {
+  const wrap = document.getElementById(wrapId);
+  const input = wrap.querySelector('input');
+  wrap.querySelectorAll('.tag').forEach(t => t.remove());
+  tags.forEach(val => {
+    const tag = document.createElement('span');
+    tag.className = 'tag';
+    tag.innerHTML = `${esc(val)} <span class="tag-x" onclick="this.parentElement.remove()">✕</span>`;
+    wrap.insertBefore(tag, input);
+  });
+}
+
+// ============================================================
+// MODAL IMÓVEL
+// ============================================================
+const SUBTIPOS = {
+  Urbano: ['Apartamento', 'Casa', 'Terreno'],
+  Rural: ['Chácara', 'Sítio', 'Fazenda']
+};
+
+function initModalImovel(im) {
+  document.getElementById('modal-imovel-title').textContent = im ? 'Editar imóvel' : 'Novo imóvel';
+  document.getElementById('imovel-edit-id').value = im?.id || '';
+  document.getElementById('delete-imovel').style.display = im ? '' : 'none';
+  document.getElementById('imovel-codigo').value = im?.codigo || 'IM-' + String(DB.nextIds.imoveis).padStart(4, '0');
+  document.getElementById('imovel-area').value = im?.area || '';
+  document.getElementById('imovel-categoria').value = im?.categoria || 'Urbano';
+  toggleSubtipo(im?.subtipo);
+  document.getElementById('imovel-finalidade').value = im?.finalidade || 'venda';
+  document.getElementById('imovel-rua').value = im?.rua || '';
+  document.getElementById('imovel-numero').value = im?.numero || '';
+  document.getElementById('imovel-bairro').value = im?.bairro || '';
+  document.getElementById('imovel-cidade').value = im?.cidade || '';
+  document.getElementById('imovel-venda').value = im?.venda || '';
+  document.getElementById('imovel-aluguel').value = im?.aluguel || '';
+  toggleValores();
+  // Proprietários
+  tempProprietarios = im ? [...im.proprietarios] : [];
+  renderProprietariosList();
+  // Select clientes
+  const sel = document.getElementById('sel-proprietario');
+  sel.innerHTML = '<option value="">Selecione um cliente...</option>' + DB.clientes.map(c => `<option value="${c.id}">${esc(c.nome)}</option>`).join('');
+}
+
+function toggleSubtipo(sel) {
+  const cat = document.getElementById('imovel-categoria').value;
+  const st = document.getElementById('imovel-subtipo');
+  st.innerHTML = SUBTIPOS[cat].map(s => `<option value="${s}">${s}</option>`).join('');
+  if (sel) st.value = sel;
+}
+
+function toggleValores() {
+  const fn = document.getElementById('imovel-finalidade').value;
+  document.getElementById('wrap-venda').style.display = fn === 'aluguel' ? 'none' : '';
+  document.getElementById('wrap-aluguel').style.display = fn === 'venda' ? 'none' : '';
+}
+
+function renderProprietariosList() {
+  document.getElementById('proprietarios-list').innerHTML = tempProprietarios.map((p, i) => {
+    const c = getCliente(p.clienteId);
+    return `<div class="corretor-tag">
+      <div class="avsm" style="background:${avatarColor(p.clienteId)[0]};color:${avatarColor(p.clienteId)[1]}">${initials(c?.nome || '?')}</div>
+      <span class="ct-name">${esc(c?.nome || '?')}</span>
+      <span class="ct-creci">${p.pct}% de posse</span>
+      <i class="ti ti-trash ct-rm" onclick="removeProprietario(${i})"></i>
+    </div>`;
+  }).join('');
+}
+
+function addProprietario() {
+  const id = parseInt(document.getElementById('sel-proprietario').value);
+  const pct = parseInt(document.getElementById('imovel-prop-pct').value) || 100;
+  if (!id) { toast('Selecione um cliente', true); return; }
+  if (tempProprietarios.some(p => p.clienteId === id)) { toast('Proprietário já adicionado', true); return; }
+  tempProprietarios.push({ clienteId: id, pct });
+  renderProprietariosList();
+}
+
+function removeProprietario(i) { tempProprietarios.splice(i, 1); renderProprietariosList(); }
+
+async function saveImovel() {
+  const id = document.getElementById('imovel-edit-id').value;
+  const fn = document.getElementById('imovel-finalidade').value;
+  const obj = {
+    codigo: document.getElementById('imovel-codigo').value,
+    categoria: document.getElementById('imovel-categoria').value,
+    subtipo: document.getElementById('imovel-subtipo').value,
+    area: parseFloat(document.getElementById('imovel-area').value) || 0,
+    rua: document.getElementById('imovel-rua').value,
+    numero: document.getElementById('imovel-numero').value || null,
+    bairro: document.getElementById('imovel-bairro').value,
+    cidade: document.getElementById('imovel-cidade').value,
+    finalidade: fn,
+    venda: fn !== 'aluguel' ? parseFloat(document.getElementById('imovel-venda').value) || null : null,
+    aluguel: fn !== 'venda' ? parseFloat(document.getElementById('imovel-aluguel').value) || null : null,
+    proprietarios: [...tempProprietarios]
+  };
+  if (!obj.codigo || !obj.rua) { toast('Preencha código e endereço', true); return; }
+  if (obj.proprietarios.length === 0) { toast('Adicione ao menos um proprietário', true); return; }
+  await persist('imoveis', id, obj, 'modal-imovel',
+    id ? 'Imóvel atualizado com sucesso' : 'Imóvel cadastrado com sucesso');
+}
+
+function editImovel(id) {
+  const im = getImovel(id);
+  openModal('modal-imovel');
+  setTimeout(() => initModalImovel(im), 0);
+}
+
+// ============================================================
+// MODAL CLIENTE
+// ============================================================
+function initModalCliente(c) {
+  document.getElementById('modal-cliente-title').textContent = c ? 'Editar cliente' : 'Novo cliente';
+  document.getElementById('cliente-edit-id').value = c?.id || '';
+  document.getElementById('delete-cliente').style.display = c ? '' : 'none';
+  document.getElementById('cliente-codigo').value = c?.codigo || 'CLI-' + String(DB.nextIds.clientes).padStart(4, '0');
+  document.getElementById('cliente-cpf').value = c?.cpf || '';
+  document.getElementById('cliente-nome').value = c?.nome || '';
+  document.getElementById('cliente-perfil').value = c?.perfil || 'interessado';
+  setTags('cliente-telefones-wrap', c?.telefones || []);
+}
+
+async function saveCliente() {
+  const id = document.getElementById('cliente-edit-id').value;
+  const tels = getTags('cliente-telefones-wrap');
+  const input = document.querySelector('#cliente-telefones-wrap input').value.trim();
+  if (input) tels.push(input);
+  const obj = {
+    codigo: document.getElementById('cliente-codigo').value,
+    cpf: document.getElementById('cliente-cpf').value,
+    nome: document.getElementById('cliente-nome').value,
+    telefones: tels,
+    perfil: document.getElementById('cliente-perfil').value
+  };
+  if (!obj.nome || !obj.cpf) { toast('Nome e CPF são obrigatórios', true); return; }
+  if (obj.telefones.length === 0) { toast('Informe ao menos um telefone', true); return; }
+  if (!id && DB.clientes.find(c => c.cpf === obj.cpf)) { toast('CPF já cadastrado', true); return; }
+  await persist('clientes', id, obj, 'modal-cliente',
+    id ? 'Cliente atualizado' : 'Cliente cadastrado');
+}
+
+function editCliente(id) {
+  const c = getCliente(id);
+  openModal('modal-cliente');
+  setTimeout(() => initModalCliente(c), 0);
+}
+
+// ============================================================
+// MODAL CORRETOR
+// ============================================================
+function initModalCorretor(c) {
+  document.getElementById('modal-corretor-title').textContent = c ? 'Editar corretor' : 'Novo corretor';
+  document.getElementById('corretor-edit-id').value = c?.id || '';
+  document.getElementById('delete-corretor').style.display = c ? '' : 'none';
+  document.getElementById('corretor-nome').value = c?.nome || '';
+  document.getElementById('corretor-cpf').value = c?.cpf || '';
+  document.getElementById('corretor-creci').value = c?.creci || '';
+  setTags('corretor-telefones-wrap', c?.telefones || []);
+}
+
+async function saveCorretor() {
+  const id = document.getElementById('corretor-edit-id').value;
+  const tels = getTags('corretor-telefones-wrap');
+  const input = document.querySelector('#corretor-telefones-wrap input').value.trim();
+  if (input) tels.push(input);
+  const obj = {
+    nome: document.getElementById('corretor-nome').value,
+    cpf: document.getElementById('corretor-cpf').value,
+    creci: document.getElementById('corretor-creci').value,
+    telefones: tels
+  };
+  if (!obj.nome || !obj.cpf || !obj.creci) { toast('Nome, CPF e CRECI são obrigatórios', true); return; }
+  if (obj.telefones.length === 0) { toast('Informe ao menos um telefone', true); return; }
+  if (!id && DB.corretores.find(c => c.cpf === obj.cpf)) { toast('CPF já cadastrado', true); return; }
+  if (!id && DB.corretores.find(c => c.creci === obj.creci)) { toast('CRECI já cadastrado', true); return; }
+  await persist('corretores', id, obj, 'modal-corretor',
+    id ? 'Corretor atualizado' : 'Corretor cadastrado');
+}
+
+function editCorretor(id) {
+  const c = getCorretor(id);
+  openModal('modal-corretor');
+  setTimeout(() => initModalCorretor(c), 0);
+}
+
+// ============================================================
+// MODAL CONTRATO
+// ============================================================
+function initModalContrato(ct) {
+  document.getElementById('modal-contrato-title').textContent = ct ? 'Editar contrato' : 'Novo contrato';
+  document.getElementById('contrato-edit-id').value = ct?.id || '';
+  document.getElementById('delete-contrato').style.display = ct ? '' : 'none';
+  document.getElementById('contrato-codigo').value = ct?.codigo || 'CT-' + String(DB.nextIds.contratos).padStart(4, '0');
+  document.getElementById('contrato-tipo').value = ct?.tipo || 'venda';
+  document.getElementById('contrato-valor').value = ct?.valor || '';
+  document.getElementById('contrato-comissao').value = ct?.comissao || '';
+  document.getElementById('contrato-data').value = ct?.data || new Date().toISOString().slice(0, 10);
+  document.getElementById('contrato-situacao').value = ct?.situacao || 'em espera';
+  document.getElementById('contrato-entrada').value = ct?.entrada || '';
+  document.getElementById('contrato-parcelas').value = ct?.parcelas || '';
+  document.getElementById('contrato-duracao').value = ct?.duracao || '';
+  document.getElementById('contrato-vencdia').value = ct?.vencdia || '';
+  toggleContrato();
+  // Imóveis
+  document.getElementById('contrato-imovel').innerHTML = DB.imoveis.map(i => `<option value="${i.id}" ${ct?.imovelId === i.id ? 'selected' : ''}>${esc(i.codigo)} — ${esc(i.subtipo)} · ${esc(i.bairro)}</option>`).join('');
+  // Clientes
+  const cliOpts = DB.clientes.map(c => `<option value="${c.id}">${esc(c.nome)}</option>`).join('');
+  document.getElementById('sel-adquirente').innerHTML = '<option value="">Selecionar adquirente...</option>' + cliOpts;
+  document.getElementById('sel-cedente').innerHTML = '<option value="">Selecionar cedente...</option>' + cliOpts;
+  // Corretores
+  document.getElementById('sel-corretor-contrato').innerHTML = '<option value="">Selecionar corretor...</option>' + DB.corretores.map(c => `<option value="${c.id}">${esc(c.nome)}</option>`).join('');
+  // Partes
+  tempAdquirentes = ct ? [...ct.adquirentes] : [];
+  tempCedentes = ct ? [...ct.cedentes] : [];
+  tempCorretoresContrato = ct ? [...ct.corretores] : [];
+  renderPartesList('adquirente');
+  renderPartesList('cedente');
+  renderCorretoresContratoList();
+}
+
+function toggleContrato() {
+  const tp = document.getElementById('contrato-tipo').value;
+  document.getElementById('wrap-contrato-venda').style.display = tp === 'venda' ? '' : 'none';
+  document.getElementById('wrap-contrato-aluguel').style.display = tp === 'aluguel' ? '' : 'none';
+}
+
+function renderPartesList(tipo) {
+  const arr = tipo === 'adquirente' ? tempAdquirentes : tempCedentes;
+  document.getElementById(`contrato-${tipo}s-list`).innerHTML = arr.map((p, i) => {
+    const c = getCliente(p.clienteId);
+    return `<div class="corretor-tag">
+      <div class="avsm" style="background:${avatarColor(p.clienteId)[0]};color:${avatarColor(p.clienteId)[1]}">${initials(c?.nome || '?')}</div>
+      <span class="ct-name">${esc(c?.nome || '?')}</span>
+      <i class="ti ti-trash ct-rm" onclick="removeParte('${tipo}',${i})"></i>
+    </div>`;
+  }).join('');
+}
+
+function addContratoParte(tipo) {
+  const selId = tipo === 'adquirente' ? 'sel-adquirente' : 'sel-cedente';
+  const id = parseInt(document.getElementById(selId).value);
+  if (!id) { toast('Selecione um cliente', true); return; }
+  const arr = tipo === 'adquirente' ? tempAdquirentes : tempCedentes;
+  if (arr.some(p => p.clienteId === id)) { toast('Cliente já adicionado', true); return; }
+  arr.push({ clienteId: id });
+  renderPartesList(tipo);
+}
+
+function removeParte(tipo, i) {
+  if (tipo === 'adquirente') tempAdquirentes.splice(i, 1);
+  else tempCedentes.splice(i, 1);
+  renderPartesList(tipo);
+}
+
+function renderCorretoresContratoList() {
+  document.getElementById('contrato-corretores-list').innerHTML = tempCorretoresContrato.map((p, i) => {
+    const c = getCorretor(p.corretorId);
+    return `<div class="corretor-tag">
+      <div class="avsm" style="background:${avatarColor(p.corretorId)[0]};color:${avatarColor(p.corretorId)[1]}">${initials(c?.nome || '?')}</div>
+      <span class="ct-name">${esc(c?.nome || '?')}</span>
+      <span class="ct-creci">${p.pct}% comissão</span>
+      <i class="ti ti-trash ct-rm" onclick="removeCorretorContrato(${i})"></i>
+    </div>`;
+  }).join('');
+}
+
+function addContratoCorretor() {
+  const id = parseInt(document.getElementById('sel-corretor-contrato').value);
+  const pct = parseInt(document.getElementById('contrato-corr-pct').value) || 100;
+  if (!id) { toast('Selecione um corretor', true); return; }
+  if (tempCorretoresContrato.some(p => p.corretorId === id)) { toast('Corretor já adicionado', true); return; }
+  tempCorretoresContrato.push({ corretorId: id, pct });
+  renderCorretoresContratoList();
+}
+
+function removeCorretorContrato(i) { tempCorretoresContrato.splice(i, 1); renderCorretoresContratoList(); }
+
+async function saveContrato() {
+  const id = document.getElementById('contrato-edit-id').value;
+  const tipo = document.getElementById('contrato-tipo').value;
+  const obj = {
+    codigo: document.getElementById('contrato-codigo').value,
+    tipo,
+    valor: parseFloat(document.getElementById('contrato-valor').value) || 0,
+    comissao: parseFloat(document.getElementById('contrato-comissao').value) || 0,
+    data: document.getElementById('contrato-data').value,
+    situacao: document.getElementById('contrato-situacao').value,
+    imovelId: parseInt(document.getElementById('contrato-imovel').value),
+    adquirentes: [...tempAdquirentes],
+    cedentes: [...tempCedentes],
+    corretores: [...tempCorretoresContrato]
+  };
+  if (tipo === 'venda') { obj.entrada = parseFloat(document.getElementById('contrato-entrada').value) || 0; obj.parcelas = parseInt(document.getElementById('contrato-parcelas').value) || 0; }
+  if (tipo === 'aluguel') { obj.duracao = parseInt(document.getElementById('contrato-duracao').value) || 0; obj.vencdia = parseInt(document.getElementById('contrato-vencdia').value) || 1; }
+  if (!obj.codigo || !obj.imovelId) { toast('Código e imóvel são obrigatórios', true); return; }
+  if (obj.adquirentes.length === 0) { toast('Adicione ao menos um adquirente', true); return; }
+  if (obj.cedentes.length === 0) { toast('Adicione ao menos um cedente', true); return; }
+  if (obj.corretores.length === 0) { toast('Adicione ao menos um corretor', true); return; }
+  await persist('contratos', id, obj, 'modal-contrato',
+    id ? 'Contrato atualizado' : 'Contrato cadastrado');
+}
+
+function editContrato(id) {
+  const ct = getContrato(id);
+  openModal('modal-contrato');
+  setTimeout(() => initModalContrato(ct), 0);
+}
+
+// ============================================================
+// MODAL BOLETO
+// ============================================================
+function initModalBoleto(b) {
+  document.getElementById('modal-boleto-title').textContent = b ? 'Editar boleto' : 'Novo boleto';
+  document.getElementById('boleto-edit-id').value = b?.id || '';
+  document.getElementById('delete-boleto').style.display = b ? '' : 'none';
+  document.getElementById('boleto-contrato').innerHTML = DB.contratos.map(c => `<option value="${c.id}" ${b?.contratoId === c.id ? 'selected' : ''}>${esc(c.codigo)}</option>`).join('');
+  document.getElementById('boleto-tipo').value = b?.tipo || 'comissao';
+  document.getElementById('boleto-situacao').value = b?.situacao || 'pendente';
+  document.getElementById('boleto-valor').value = b?.valor || '';
+  document.getElementById('boleto-vencimento').value = b?.vencimento || '';
+  document.getElementById('boleto-pagamento').value = b?.pagamento || '';
+}
+
+async function saveBoleto() {
+  const id = document.getElementById('boleto-edit-id').value;
+  const obj = {
+    contratoId: parseInt(document.getElementById('boleto-contrato').value),
+    tipo: document.getElementById('boleto-tipo').value,
+    situacao: document.getElementById('boleto-situacao').value,
+    valor: parseFloat(document.getElementById('boleto-valor').value) || 0,
+    vencimento: document.getElementById('boleto-vencimento').value,
+    pagamento: document.getElementById('boleto-pagamento').value || null
+  };
+  if (!obj.valor || !obj.vencimento) { toast('Valor e vencimento são obrigatórios', true); return; }
+  if (!id) obj.seq = 'BOL-' + String(DB.nextIds.boletos).padStart(4, '0');
+  else obj.seq = DB.boletos.find(b => b.id === parseInt(id))?.seq;
+  await persist('boletos', id, obj, 'modal-boleto',
+    id ? 'Boleto atualizado' : 'Boleto cadastrado');
+}
+
+function editBoleto(id) {
+  const b = DB.boletos.find(b => b.id === id);
+  openModal('modal-boleto');
+  setTimeout(() => initModalBoleto(b), 0);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+async function api(path, options = {}) {
+  const response = await fetch(path, {
+    credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+    ...options
+  });
+  let data = {};
+  try { data = await response.json(); } catch (_) {}
+  if (!response.ok) {
+    throw new Error(data.detail || 'Não foi possível concluir a operação.');
+  }
+  return data;
+}
+
+async function loadData() {
+  DB = await api('/api/bootstrap');
+  renderDashboard();
+}
+
+async function persist(resource, id, obj, modal, successMessage) {
+  try {
+    await api(`/api/${resource}${id ? '/' + id : ''}`, {
+      method: id ? 'PUT' : 'POST',
+      body: JSON.stringify(obj)
+    });
+    await loadData();
+    closeModal(modal);
+    renderPage(resource);
+    toast(successMessage);
+  } catch (error) {
+    toast(error.message, true);
+  }
+}
+
+async function removeResource(resource, inputId, modal) {
+  const id = document.getElementById(inputId).value;
+  if (!id || !confirm('Deseja realmente excluir este registro?')) return;
+  try {
+    await api(`/api/${resource}/${id}`, { method: 'DELETE' });
+    await loadData();
+    closeModal(modal);
+    renderPage(resource);
+    toast('Registro excluído com sucesso');
+  } catch (error) {
+    toast(error.message, true);
+  }
+}
+
+startApp();
+</script>
+</body>
+</html>
+async function startApp() {
+  try {
+    await loadData();
+  } catch (error) {
+    toast(error.message, true);
+  }
+}
+
+
+

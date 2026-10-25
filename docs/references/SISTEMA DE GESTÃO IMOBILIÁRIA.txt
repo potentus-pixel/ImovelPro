@@ -1,0 +1,20 @@
+SISTEMA DE GESTÃO IMOBILIÁRIA
+
+1º Funcionalidades:
+	Imediatas:
+		Registrar Imóveis, Clientes, Corretores 
+		Manter registro dos Contratos
+		Gerar Boletos
+		Criar Dashboards de Desempenho
+
+	Não-Imediatas:
+		Enviar cobranças automáticas via whattsap
+		Auxiliar na escrita de contratos
+		Fazer consultas de score dos clientes
+		Mudança de status dos imóveis automático (ativo, em negociação, alugado)
+		Encontro automático de perfis (ex: um cliente vai à imobiliária procurando um imóvel de determinado jeito e 		no momento não temos, mas no momento que cadastramos um imóvel que é o que ele procura, o sistema dá a 			notificação automática).
+
+2º Possibilidades:
+	Versão web 
+	Transformar num marketplace
+	Agente IA que publica os imóveis automaticamente em marketplaces de imóveis
